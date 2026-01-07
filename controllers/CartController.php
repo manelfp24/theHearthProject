@@ -118,30 +118,96 @@ class CartController {
         exit();
     }
 
+    /**
+     * Action: Show the Checkout Form (Address & Payment)
+     */
     public function checkout() {
-        // (Paste your existing checkout code)
-        if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) { header("Location: index.php?controller=Product"); exit(); }
+        // Security: Cart cannot be empty
+        if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
+            header("Location: index.php?controller=Product");
+            exit();
+        }
+
+        // Just load the view
+        require_once '../views/cart/checkout.php';
+    }
+
+    /**
+     * Action: Handle the form submission and save to DB
+     */
+    // controllers/CartController.php
+
+    public function processOrder() {
+        require_once '../models/OrderDAO.php';
+
+        // 1. Security Check
+        if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
+            header("Location: index.php?controller=Product");
+            exit();
+        }
+
+        // 2. Prepare Items & Calculate Initial Subtotal
         $cartIds = array_keys($_SESSION['cart']);
         $cartItems = [];
-        $totalPrice = 0;
+        $calculatedSubtotal = 0; // This is the price BEFORE discount
+
         foreach ($cartIds as $id) {
             $product = ProductDAO::getProductById($id);
             if ($product) {
                 $qty = $_SESSION['cart'][$id];
                 $price = $product->getBasePrice();
-                $cartItems[] = [ 'product' => $product, 'quantity' => $qty ];
-                $totalPrice += ($price * $qty);
+                
+                $cartItems[] = [
+                    'product' => $product,
+                    'quantity' => $qty
+                ];
+                $calculatedSubtotal += ($price * $qty);
             }
         }
+
+        // 3. Handle Coupon Logic
+        $couponId = null;        // Default: NULL in DB
+        $discountAmount = 0.00;  // Default: 0.00
+        $finalPrice = $calculatedSubtotal;
+
+        if (isset($_SESSION['applied_coupon'])) {
+             $coupon = $_SESSION['applied_coupon'];
+             
+             // Save the ID to send to DB
+             $couponId = $coupon['id']; 
+
+             // Calculate Discount
+             if ($coupon['type'] == 'percentage') {
+                 $discountAmount = $calculatedSubtotal * ($coupon['value'] / 100);
+             } else {
+                 $discountAmount = $coupon['value'];
+             }
+             
+             // Calculate Final Price
+             $finalPrice = max(0, $calculatedSubtotal - $discountAmount);
+        }
+
+        // 4. Get User Info
         $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
-        $orderId = OrderDAO::createOrder($userId, $cartItems, $totalPrice);
+
+        // 5. Save to Database (Passing new variables!)
+        // function createOrder($userId, $cartItems, $totalPrice, $couponId, $discountAmount)
+        $orderId = OrderDAO::createOrder($userId, $cartItems, $finalPrice, $couponId, $discountAmount);
+
         if ($orderId) {
+            // Cleanup Session
             unset($_SESSION['cart']);
             unset($_SESSION['cart_count']);
+            unset($_SESSION['applied_coupon']); // Important: clear the used coupon
+            
             $_SESSION['last_order_id'] = $orderId;
+            
             header("Location: index.php?controller=Cart&action=success");
             exit();
-        } else { echo "Error processing order. Please try again."; }
+        } else {
+            // Optional: Log error or show message
+            echo "Error processing order. Please try again.";
+        }
     }
 
     public function success() {

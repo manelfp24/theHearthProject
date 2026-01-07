@@ -8,32 +8,41 @@ class OrderDAO {
      * Creates an order and its details in the database.
      * Returns the new Order ID or False.
      */
-    public static function createOrder($userId, $cartItems, $totalPrice) {
+    // models/OrderDAO.php
+
+    /**
+     * UPDATED: Now accepts Coupon ID and Discount Amount
+     */
+    public static function createOrder($userId, $cartItems, $totalPrice, $couponId = null, $discountAmount = 0.00) {
         $con = Database::connect();
-        
-        // 1. START TRANSACTION
         $con->begin_transaction();
 
         try {
-            // 2. Insert the HEADER (customer_order)
-            // Note: table_number is NULL for online orders usually, or we could ask for it.
-            // status default is 'pending'
-            $stmt = $con->prepare("INSERT INTO customer_order (user_id, subtotal, total_price, status, order_date) VALUES (?, ?, ?, 'pending', NOW())");
+            // Calculate Subtotal (Total Price + Discount Amount)
+            // Logic: Final Price = Subtotal - Discount
+            // So: Subtotal = Final Price + Discount
+            $subtotal = $totalPrice + $discountAmount;
+
+            // 1. Insert HEADER with Coupon and Discount info
+            // Added: coupon_used_id, total_discount
+            $stmt = $con->prepare("INSERT INTO customer_order 
+                (user_id, coupon_used_id, subtotal, total_discount, total_price, status, order_date) 
+                VALUES (?, ?, ?, ?, ?, 'pending', NOW())");
             
-            // Assuming no discount for now, so subtotal = total
-            $stmt->bind_param("idd", $userId, $totalPrice, $totalPrice);
+            // Types: i (int), i (int), d (double), d (double), d (double)
+            $stmt->bind_param("iiddd", $userId, $couponId, $subtotal, $discountAmount, $totalPrice);
+            
             $stmt->execute();
-            
             $orderId = $con->insert_id;
             $stmt->close();
 
-            // 3. Insert the LINES (order_line)
+            // 2. Insert LINES (Same as before)
             $stmtLine = $con->prepare("INSERT INTO order_line (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)");
             
             foreach ($cartItems as $item) {
                 $prod = $item['product'];
                 $qty = $item['quantity'];
-                $price = $prod->getBasePrice(); // Get price from object to be safe
+                $price = $prod->getBasePrice();
                 $prodId = $prod->getProductId();
 
                 $stmtLine->bind_param("iiid", $orderId, $prodId, $qty, $price);
@@ -41,16 +50,14 @@ class OrderDAO {
             }
             $stmtLine->close();
 
-            // 4. COMMIT (Save changes)
             $con->commit();
             $con->close();
             return $orderId;
 
         } catch (Exception $e) {
-            // 5. ROLLBACK (Undo everything if error)
             $con->rollback();
             $con->close();
-            return false;
+            return false; // Or throw $e for debugging
         }
     }
 
