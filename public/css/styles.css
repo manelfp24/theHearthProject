@@ -1,0 +1,1581 @@
+/* =========================================
+   1. SETUP & VARIABLES
+   ========================================= */
+/* Import the font requested */
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+:root {
+    /* YOUR PALETTE */
+    --hearth-red: #CB171A;    /* Buttons & Accents */
+    --hearth-beige: #EFEBE6;  /* Page Background */
+    --hearth-grey: #757575;   /* Secondary Text */
+    --hearth-black: #000000;  /* Navbar & Footer */
+    --hearth-white: #FFFFFF;  /* Text on dark backgrounds */
+}
+
+body {
+    font-family: 'Libre Baskerville', serif;
+    background-color: var(--hearth-white);
+    color: var(--hearth-black);
+    
+    /* THIS IS THE MARGIN YOU ASKED FOR */
+    /* It adds space on left and right, framing the whole content */
+    padding: 0 var(--page-margin); 
+    
+    /* Ensure content doesn't touch top/bottom edges strictly if you don't want it to */
+    margin: 0;
+    overflow-x: hidden; /* Prevents horizontal scrollbars */
+}
+
+/* =========================================
+   2. NAVIGATION BAR
+   ========================================= */
+/* --- NAVIGATION BAR --- */
+
+/* Navbar Container */
+.hearth-navbar {
+    background-color: var(--hearth-white);
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    /* Ensure relative positioning for the centered logo to work */
+    position: relative; 
+}
+
+
+/* --- CENTER LOGO SPECIFICS --- */
+.center-logo {
+    /* Absolute positioning creates perfect centering */
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    
+    /* Your specific red color */
+    color: #CB171A !important;
+    
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 700; /* Bold */
+    font-size: 1.75rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none !important;
+}
+
+/* STRICT RULE: No hover effect for the center logo */
+.center-logo:hover {
+    color: #CB171A !important; /* Remains the same red */
+}
+
+.navbar {
+  display: flex;
+  align-items: center; /* Vertically centers the logo */
+  padding: 1rem;
+  background-color: var(--hearth-white);
+}
+
+.logo {
+  height: 40px; /* Adjust this to match your navbar height */
+  width: auto;  /* Keeps the aspect ratio correct */
+}
+
+
+/* --- LEFT & RIGHT INTERACTIVE ELEMENTS --- */
+
+/* 1. Left "EXPERIENCE" Trigger */
+.nav-left-trigger {
+    color: #000000; /* Black by default */
+    font-weight: 600;
+    letter-spacing: 1px;
+    transition: color 0.3s ease;
+}
+
+/* 2. Right Side Icon Links */
+.nav-icon-link {
+    color: #000000; /* Black by default */
+    text-decoration: none;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+}
+
+/* HOVER STATE for both left and right elements */
+.nav-left-trigger:hover,
+.nav-icon-link:hover {
+    color: #CB171A; /* Change to your Red on hover */
+}
+
+/* Utility to hide default bootstrap dropdown arrow */
+.dropdown-toggle.hide-arrow::after {
+    display: none !important;
+}
+
+/* =========================================
+   3. HERO BANNER
+   ========================================= */
+/* --- Banner Layout --- */
+.hero-banner {
+    position: relative;
+    min-height: 85vh;
+    background-size: cover;
+    background-position: center;
+    color: white;
+
+    /* FLEXBOX: Aligns content to bottom left */
+    display: flex;
+    align-items: flex-end; 
+    justify-content: flex-start; 
+    padding-bottom: 100px; 
+
+    /* --- NEW CHANGES HERE --- */
+    margin: 0 3.5rem; /* Adds 2rem space on Left and Right */
+    overflow: hidden; /* Ensures the image stays inside the rounded corners */
+}
+
+/* --- Dark Overlay --- */
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Gradient: darker at bottom to make white text pop */
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
+    z-index: 1;
+}
+
+/* --- Typography & Content --- */
+.banner-content {
+    /* Crucial for lifting text above the overlay */
+    position: relative; 
+    z-index: 2; 
+
+    /* Alignment & Layout */
+    width: 100%;
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding-left: 20px; 
+    
+    font-family: 'Libre Baskerville', serif;
+    text-align: left;
+}
+
+.subheading {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700; /* Bold for the small "DISCOVER" text */
+    display: block;
+    margin-bottom: 15px;
+    color: #e0e0e0; /* Slightly off-white for elegance */
+}
+
+.banner-content h1 {
+    font-size: clamp(2.5rem, 5vw, 3rem);
+    line-height: 1.1;
+    margin-bottom: 30px;
+    font-weight: 700; /* Bold for the main headline */
+}
+
+/* --- BUTTON STYLES (Red Sweep Effect) --- */
+
+.cta-button {
+    /* Layout Essentials for <a> tags */
+    display: inline-block;
+    text-decoration: none;
+    text-align: center;
+    
+    /* Spacing */
+    margin-top: 15px; /* Adds space above the button */
+    padding: 12px 35px;
+    
+    /* Font & Appearance */
+    font-family: 'Libre Baskerville', serif; /* Matches your theme */
+    font-size: 0.9em; /* Adjusted slightly for balance */
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    
+    /* Colors (Default State) */
+    background: #CB171A; /* Red Background */
+    color: #FFFFFF;      /* White Text */
+    border: 2px solid #CB171A; /* Red Border */
+    
+    /* Shape */
+    border-radius: 30px 10px 30px 30px; /* The unique shape you requested */
+    
+    /* Animation Essentials */
+    position: relative; 
+    overflow: hidden; /* Crucial: keeps the sweep effect inside the button */
+    z-index: 1;
+    transition: color 0.4s ease-in-out, border-color 0.4s ease-in-out; 
+}
+
+/* --- The "Sweep" Effect (::before) --- */
+.cta-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    
+    /* Make it huge to cover the whole button during rotation */
+    width: 450%; 
+    height: 450%; 
+    
+    /* The Sweep Color: WHITE */
+    background: #FFFFFF; 
+    z-index: -1; /* Sits behind the text */
+    
+    /* Start position: Hidden to the right */
+    transform: translate(-50%, -50%) rotate(45deg) translateX(100%);
+    
+    /* Animation speed */
+    transition: transform 0.5s ease-in-out;
+}
+
+/* --- Hover State --- */
+.cta-button:hover::before {
+    /* Move the white sweep into view */
+    transform: translate(-50%, -50%) rotate(45deg) translateX(0); 
+}
+
+.cta-button:hover {
+    color: #CB171A; /* Text turns RED to contrast with white background */
+    border-color: #CB171A; /* Border remains red */
+}
+
+/* --- Active/Click State --- */
+.cta-button:active {
+    filter: brightness(0.85); 
+    transition: filter 0.1s ease-out; 
+}
+
+/* --- Bottom Indicators (1 2 3) --- */
+.carousel-indicators-custom {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    gap: 15px;
+}
+
+.dot {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: white;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Font Update */
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 700; 
+    font-size: 1rem;
+    
+    cursor: pointer;
+}
+
+.dot.active {
+    background-color: #C21818; 
+    color: white;
+}
+
+/* =========================================
+   4. FOOTER
+   ========================================= */
+footer {
+    background-color: var(--hearth-black);
+    color: var(--hearth-beige);
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+    margin-top: auto;
+    /* border-top: 5px solid var(--hearth-red); */
+    margin-left: 2rem;
+    margin-right: 2rem;
+}
+
+/* --- CUSTOM SVG ICON STYLES --- */
+.custom-icon {
+    width: 35px;  /* Adjust this number to make icons bigger/smaller */
+    height: 35px;
+    
+    /* CRITICAL: This makes the SVG take the color of the text (Black or Red) */
+    fill: currentColor; 
+    
+    /* Optional: Ensures they align nicely with text */
+    vertical-align: middle;
+}
+
+/* On screens smaller than 768px (Tablets/Phones) */
+@media (max-width: 768px) {
+    .hero-banner {
+        margin: 0 1rem; /* Reduce space to 1rem on small screens */
+        min-height: 60vh; /* Optional: Make banner shorter on mobile */
+    }
+}
+
+/* --- SIGNATURE SECTION STYLES --- */
+
+.signature-section {
+    background-color: var(--hearth-white); /* Matches your white background */
+    padding: 80px 20px; /* Top/Bottom padding for breathing room */
+    text-align: center; /* Centers everything */
+    font-family: 'Libre Baskerville', serif;
+}
+
+/* Re-using your subheading style, but making sure it's dark text now */
+.signature-section .section-subheading {
+    font-size: 1.3rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 15px;
+    color: var(--hearth-black); /* Dark Grey */
+}
+
+.section-title {
+    font-size: 3rem;
+    color: var(--hearth-black);
+    margin-bottom: 20px;
+    font-weight: 400; /* Serif titles usually look better not bold */
+}
+
+/* Divider Styling */
+.divider-icon {
+    margin: 20px 0 30px 0;
+}
+
+/* Paragraph Text */
+.section-text {
+    max-width: 800px; /* Prevents text from hitting the edges */
+    margin: 0 auto 50px auto; /* Centers the block horizontally */
+    font-size: 1.1rem;
+    line-height: 1.8; /* Good readability */
+    color: #555555; /* Softer grey than pure black */
+}
+
+.text-underline {
+    text-decoration: underline;
+    text-decoration-color: #999; /* Subtle underline color */
+    text-underline-offset: 4px;
+}
+
+/* --- OUTLINE BUTTON (Black Pill with Sweep) --- */
+.btn-outline-black {
+    /* Layout Essentials */
+    display: inline-block;
+    padding: 12px 40px;
+    text-decoration: none;
+    text-align: center;
+    
+    /* Font Styling */
+    color: #000000; /* Dark Grey Text */
+    font-family: 'Libre Baskerville', serif; /* Matching font */
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    
+    /* Border & Shape */
+    border: 2px solid #000000; 
+    border-radius: 50px 25px 50px 50px; 
+    background: transparent; 
+    
+    /* --- ANIMATION ESSENTIALS --- */
+    position: relative; 
+    overflow: hidden; /* Keeps the sweep inside the border */
+    z-index: 1;
+    transition: color 0.4s ease-in-out; 
+}
+
+/* --- The Sweep Effect (Black) --- */
+.btn-outline-black::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    
+    /* Size: Huge to cover the diagonal rotation */
+    width: 1200%; 
+    height: 1200%; 
+    
+    /* Sweep Color: BLACK (Fills the button) */
+    background: #000000; 
+    z-index: -1; 
+    
+    /* Start Position: Hidden to the right */
+    transform: translate(-50%, -50%) rotate(45deg) translateX(100%);
+    
+    transition: transform 0.5s ease-in-out;
+}
+
+/* --- Hover State --- */
+.btn-outline-black:hover::before {
+    /* Move the black sweep in */
+    transform: translate(-50%, -50%) rotate(45deg) translateX(0); 
+}
+
+.btn-outline-black:hover {
+    color: #FFFFFF; /* Text turns WHITE to be visible on black */
+    /* Border color stays #333333, so we don't need to change it */
+}
+
+/* DIVIDER */
+/* --- New Hearth Divider (SVG) --- */
+.hearth-divider {
+    /* Dimensions (Converted from Tailwind h-2/h-3) */
+    width: 100%;
+    height: 15px; /* Sets the height so the SVG is visible */
+    
+    /* Background Properties (Converted from bg-contain, bg-center) */
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain; /* Ensures the fancy shape fits perfectly */
+    
+    /* Spacing (Converted from my-8) */
+    margin: 40px 0; 
+    
+    /* The SVG Image Code */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='71' height='9' viewBox='0 0 71 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M8.86 7.74C7.02045 7.74 5.57371 6.84322 4.19478 5.86254C4.05412 5.7625 3.91312 5.66083 3.77198 5.55905C3.2378 5.17385 2.70163 4.78721 2.17449 4.48268C1.9411 4.34785 1.70204 4.22443 1.45673 4.12072C1.70352 4.01676 1.94392 3.89286 2.17857 3.7574C2.70744 3.45209 3.24478 3.06434 3.77986 2.67822C3.91969 2.57732 4.05937 2.47652 4.19871 2.37734C5.57644 1.39662 7.0206 0.5 8.86 0.5C10.6996 0.5 12.1463 1.39678 13.5252 2.37746C13.6659 2.4775 13.8069 2.57917 13.948 2.68095C14.4822 3.06615 15.0184 3.45279 15.5455 3.75732C15.7794 3.89247 16.0191 4.01615 16.265 4.12C16.0191 4.22385 15.7794 4.34753 15.5455 4.48268C15.0184 4.78721 14.4822 5.17384 13.948 5.55904C13.8069 5.66082 13.6659 5.7625 13.5252 5.86254C12.1463 6.84322 10.6996 7.74 8.86 7.74Z' stroke='%23CB171A'/%3e%3cpath d='M35.44 3.94C32.82 3.94 30.6 0 26.58 0C22.56 0 20.34 3.94 17.72 3.94V4.3C20.34 4.3 22.56 8.24 26.58 8.24C30.6 8.24 32.81 4.3 35.44 4.3V3.94Z' fill='%23CB171A'/%3e%3cpath d='M44.3 0.5C46.1396 0.5 47.5863 1.39678 48.9652 2.37746C49.1059 2.4775 49.2469 2.57917 49.388 2.68095C49.9222 3.06615 50.4584 3.45279 50.9855 3.75732C51.2189 3.89216 51.458 4.01557 51.7033 4.11928C51.4565 4.22324 51.2161 4.34714 50.9814 4.4826C50.4526 4.78791 49.9152 5.17566 49.3801 5.56178C49.2403 5.66268 49.1006 5.76348 48.9613 5.86266C47.5836 6.84338 46.1394 7.74 44.3 7.74C42.4605 7.74 41.0137 6.84322 39.6348 5.86254C39.4941 5.7625 39.3531 5.66083 39.212 5.55905C38.6778 5.17385 38.1416 4.78721 37.6145 4.48268C37.3806 4.34753 37.1409 4.22385 36.895 4.12C37.1409 4.01615 37.3806 3.89247 37.6145 3.75732C38.1416 3.45279 38.6778 3.06615 39.212 2.68095C39.3531 2.57917 39.4941 2.4775 39.6348 2.37746C41.0137 1.39678 42.4605 0.5 44.3 0.5Z' stroke='%23CB171A'/%3e%3cpath d='M70.88 3.94C68.26 3.94 66.04 0 62.02 0C58 0 55.78 3.94 53.16 3.94V4.3C55.78 4.3 58 8.24 62.02 8.24C66.04 8.24 68.25 4.3 70.88 4.3V3.94Z' fill='%23CB171A'/%3e%3c/svg%3e");
+}
+
+/* --- CAROUSEL LAYOUT --- */
+.cuts-carousel-container {
+    margin-top: 60px; /* Space between the text/button and the pictures */
+    margin-left: 2.5rem;
+    position: relative;
+}
+
+.cuts-track {
+    display: flex; /* Lines items up horizontally */
+    gap: 30px; /* Space between pictures */
+    overflow-x: auto; /* Allows scrolling */
+    scroll-behavior: smooth; /* Makes the scroll sliding animation smooth */
+    padding-bottom: 20px; /* Space for scrollbar (which we will hide) */
+    
+    /* Hiding the scrollbar for a cleaner look */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE */
+}
+.cuts-track::-webkit-scrollbar { 
+    display: none; /* Chrome/Safari */
+}
+
+/* --- CARD STYLING --- */
+.cut-card {
+    min-width: 300px; /* Ensures cards don't squish */
+    width: 30%; /* Shows roughly 3 cards on desktop */
+    text-align: left; /* Aligns text under image to left */
+    flex-shrink: 0; /* Prevents items from shrinking */
+}
+
+.img-wrapper {
+    width: 100%;
+    aspect-ratio: 4/5; /* Keeps all images the same vertical rectangle shape */
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Zooms image to fill space without stretching */
+    transition: transform 0.4s ease;
+}
+
+/* Subtle Zoom effect on Hover */
+.cut-card:hover .img-wrapper img {
+    transform: scale(1.05);
+}
+
+.cut-card h3 {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.95rem;
+    font-weight: 700; /* Bold */
+    color: #333;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1.4;
+    margin-top: 10px;
+}
+
+/* --- NAVIGATION BUTTONS (Single Capsule Style) --- */
+
+/* 1. The Wrapper: Spans full width, but pushes content to the right */
+.carousel-nav-container {
+    /* 1. Make sure this container spans the ENTIRE width of the section */
+    display: flex;
+    width: 100%; 
+    
+    /* 2. Reset any previous alignment issues */
+    margin-top: 30px;
+    padding-right: 20px; 
+}
+
+/* 2. The Pill: Borders and Shape */
+.carousel-nav-pill {
+    /* 3. MAGIC FIX: This pushes the pill all the way to the Right */
+    margin-left: auto; 
+    
+    /* Keep the pill small and styled */
+    width: fit-content; 
+    display: flex; 
+    align-items: center;
+    background: #ffffff;
+    border: 2px solid #e6e6e6; 
+    border-radius: 50px 25px 50px 50px; 
+    overflow: hidden; 
+    margin-right: 2rem;
+}
+
+/* 3. The Buttons: Transparent and clickable */
+.nav-arrow-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 15px 25px; /* Size of the click area */
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s ease;
+}
+
+.nav-arrow-btn:hover {
+    background-color: var(--hearth-red); 
+}
+
+.nav-arrow-btn svg {
+    display: block;
+}
+
+/* --- EXPERIENCE BANNER --- */
+.experience-banner {
+    position: relative;
+    /* Full width is automatic for sections, but we ensure no margins */
+    width: 100%;
+    
+    /* Height: slightly shorter than the main hero, but still impactful */
+    min-height: 70vh; 
+    
+    background-size: cover;
+    background-position: center;
+    
+    /* Flexbox for alignment */
+    display: flex;
+    align-items: flex-end; /* Aligns content to the bottom */
+    padding-bottom: 80px; /* Space from the bottom edge */
+    
+    /* Reset any border-radius if inherited */
+    border-radius: 0; 
+    overflow: hidden;
+}
+
+.experience-content {
+    /* Limit width so it doesn't span the whole screen */
+    max-width: 700px; 
+    padding-left: 20px; /* Aligns with your grid */
+    text-align: left;
+    color: #ffffff;
+    font-family: 'Libre Baskerville', serif;
+}
+
+/* Specific typography for this section */
+.experience-content h2 {
+    font-size: clamp(2rem, 4vw, 3.5rem); /* Responsive font size */
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5); /* Improves legibility on busy backgrounds */
+}
+
+/* Re-using your subheading style but ensuring it's white/gold */
+.experience-content .subheading {
+    color: #f0f0f0; /* Off-white */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    margin-bottom: 10px;
+    display: block;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-size: 1rem;
+}
+
+/* --- FOOTER STYLES --- */
+.site-footer {
+    background-color: #ffffff;
+    color: #333;
+    font-family: 'Libre Baskerville', serif;
+    padding-top: 40px;
+    padding-bottom: 40px;
+    margin-top: 80px; /* Separates footer from content above */
+}
+
+/* 1. Top Section (Join Society) */
+.footer-top-container {
+    padding-bottom: 30px;
+}
+.join-text {
+    font-size: 0.95rem;
+    color: #333;
+}
+.btn-sm {
+    padding: 8px 25px; /* Smaller version of your main button */
+    font-size: 0.8rem;
+}
+
+/* 2. The Diamond Divider */
+.footer-divider {
+    /* --- 1. FORCE FULL WIDTH (Edge-to-Edge) --- */
+    width: 100vw; /* Occupy full Viewport Width */
+    position: relative;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw; /* Pull to the left edge */
+    margin-right: -50vw; /* Pull to the right edge */
+    
+    /* --- 2. DIAMOND SIZE & ROWS --- */
+    /* Size: 12px wide x 6px high per diamond */
+    background-size: 12px 6px; 
+    
+    /* Height: 3 rows (6px * 3 = 18px) */
+    height: 18px; 
+    
+    /* Tile vertically and horizontally */
+    background-repeat: repeat; 
+
+    /* Your Diamond SVG */
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='8' viewBox='0 0 16 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolygon points='8,0 16,4 8,8 0,4' fill='%23000000'/%3E%3C/svg%3E");
+    
+    /* Spacing below */
+    margin-top: 0;
+    margin-bottom: 50px; 
+}
+
+/* 3. Main Content Grid */
+.footer-logo {
+    text-decoration: none;
+    color: #000;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    line-height: 1.2;
+    display: inline-block;
+    text-align: center;
+}
+.footer-logo .logo-big {
+    font-size: 2.5rem; /* Big "HEARTH" text */
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.footer-heading {
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    color: #000;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.footer-links li {
+    margin-bottom: 12px;
+}
+.footer-links a {
+    text-decoration: none;
+    color: #333;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    transition: color 0.2s;
+}
+.footer-links a:hover {
+    color: #CB171A; /* Highlight color */
+}
+
+/* --- Footer Logo Image --- */
+.footer-logo-link {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.footer-logo-img {
+    /* Adjust this width to match the size you want */
+    width: 200px; 
+    height: auto; /* Maintains aspect ratio */
+    
+    display: block; /* Removes any weird gap below the image */
+    
+    /* Center the logo on mobile if the parent is text-center */
+    margin-bottom: 20px; 
+}
+
+/* Social Icons */
+.social-icons {
+    display: flex;
+    gap: 15px; /* Adds consistent space between icons */
+}
+
+.social-icons a {
+    color: #000; /* Default icon color (black) */
+    display: inline-flex; /* Ensures SVGs align perfectly */
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+.social-icons a:hover {
+    color: #CB171A; /* Change SVG fill to Red on hover */
+}
+
+/* Ensure the SVG respects the color of the parent link */
+.social-icons svg {
+    /* If you want to force a specific size in CSS instead of HTML, do it here: */
+    width: 35px;
+    height: 35px;
+}
+
+/* 4. Bottom Legal Section */
+.footer-bottom {
+    margin-top: 60px;
+    border-top: 1px solid #eee; /* Very subtle line separation if needed */
+    padding-top: 30px;
+}
+
+.legal-links a {
+    text-decoration: none;
+    color: #333;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.legal-links .separator {
+    margin: 0 10px;
+    font-weight: bold;
+}
+
+.copyright-row {
+    font-size: 0.75rem;
+    color: #777; /* Grey text for copyright */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Mobile Tweak: Stack copyright text on small screens */
+@media (max-width: 768px) {
+    .copyright-row {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+}
+
+/* --- SCROLL TO TOP BUTTON --- */
+.scroll-top-btn {
+    /* Fixed Position: Always sits in the corner */
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99; /* Ensures it sits on top of everything */
+    
+    /* Appearance */
+    width: 50px;
+    height: 50px;
+    background-color: #000000; /* Black background */
+    color: #ffffff; /* White arrow */
+    border: none;
+    border-radius: 50%; /* Circle shape */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    
+    /* Centering the SVG */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Animation: Start hidden */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+}
+
+/* State: When the class 'show' is added via JS */
+.scroll-top-btn.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+/* Hover Effect */
+.scroll-top-btn:hover {
+    background-color: #CB171A; /* Turns Hearth Red on hover */
+}
+
+
+/* --- MENU PAGE STYLES --- */
+
+/* Breadcrumbs styling */
+.breadcrumbs-text {
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    color: #888;
+    font-family: 'Libre Baskerville', serif;
+}
+
+/* Visual Category Navigation */
+.menu-cat-nav-bar {
+    width: 100%; 
+}
+
+.cat-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px; 
+    /* REMOVED: transition: transform... (No more floating) */
+}
+
+/* REMOVED: .cat-nav-item:hover { transform: translateY... } */
+
+/* Thumbnail Container */
+.cat-thumb {
+    width: 100%;
+    aspect-ratio: 4 / 3; 
+    overflow: hidden;
+    
+    /* REMOVED: background: #fff; padding: 5px; (No more border) */
+    /* REMOVED: box-shadow */
+}
+
+.cat-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Category Title Text */
+.cat-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    color: #000000; /* Always Black initially */
+    transition: color 0.3s ease;
+    text-transform: uppercase;
+}
+
+/* Hover State -> Turns RED */
+.cat-nav-item:hover .cat-title {
+    color: #CB171A; /* Hearth Red */
+}
+
+/* --- MENU SECTIONS STYLING --- */
+
+/* 1. Section Header */
+.section-main-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 3rem; 
+    color: #000000;
+    margin: 0;
+}
+
+.section-description {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    max-width: 400px;
+    margin-left: auto; 
+}
+
+/* 2. Product Card (Grid) */
+.menu-product-card {
+    text-align: left; 
+}
+
+/* Ensure the price matches the name size exactly */
+.menu-product-card .fs-5 {
+    font-size: 1.1rem !important; /* CHANGED: Forced to match Name size */
+    color: #000000; /* CHANGED: Pure Black */
+    line-height: 1.2 !important;
+    margin-top: 0; /* Reset margin since sizes are now identical */
+}
+
+.menu-img-wrapper {
+    width: 100%;
+    aspect-ratio: 3 / 4; 
+    overflow: hidden;
+    background-color: #f5f5f5;
+}
+
+.menu-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    transition: transform 0.5s ease;
+}
+
+/* Hover Effect: Zoom image slightly */
+.menu-product-card:hover .menu-img-wrapper img {
+    transform: scale(1.05);
+}
+
+/* 3. Product Typography & Price */
+.product-name {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.1rem; /* Base size */
+    font-weight: 700;  
+    line-height: 1.2 !important; 
+    color: #000000; /* CHANGED: Now Pure Black */
+}
+
+/* --- SECTION DIVIDER (Oval/Almond Pattern) --- */
+.hearth-section-divider {
+    width: 100%;
+    height: 40px; /* Increased height to fit the taller shapes */
+    margin: 80px 0; 
+    
+    /* UPDATED SVG PATTERN:
+       1. Changed viewBox to '0 0 60 30' (taller canvas).
+       2. Changed Path coordinates:
+          - Starts at 10,15 and ends at 50,15 (width 40).
+          - Control points at 30,0 (top) and 30,30 (bottom) create a much rounder curve.
+    */
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='30' viewBox='0 0 60 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10,15 Q30,0 50,15 Q30,30 10,15' fill='%23E6E2D8'/%3E%3C/svg%3E");
+    
+    background-repeat: repeat-x;
+    background-position: center;
+    /* Adjusted size: 50px wide x 25px high makes them look distinct and oval */
+    background-size: 50px 25px; 
+    opacity: 0.9;
+}
+/* --- GLOBAL BACK TO TOP BUTTON --- */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background-color: #CB171A; /* Hearth Red */
+    color: #FFFFFF;
+    border: none;
+    border-radius: 50%; /* Makes it a circle */
+    font-size: 1.5rem;
+    cursor: pointer;
+    
+    /* Flexbox to center the arrow icon */
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    
+    z-index: 9999; /* on top of everything */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.back-to-top:hover {
+    background-color: #a01215; /* Darker red on hover */
+    transform: translateY(-5px); /* Moves up slightly */
+    color: #FFFFFF;
+}
+
+/* Class used by JS to show the button */
+.back-to-top.show {
+    display: flex; 
+    animation: fadeIn 0.4s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- LOGIN PAGE STYLES --- */
+
+.login-page-container {
+    min-height: 60vh;
+    display: flex;
+    align-items: center;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+.login-card {
+    background-color: #f8f9fa;
+    border: none;
+    box-shadow: 0 .125rem .25rem rgba(0,0,0,.075); /* shadow-sm */
+    padding: 1.5rem; /* p-4 */
+}
+
+.login-title {
+    font-family: 'Libre Baskerville', serif;
+    margin-bottom: 10px;
+    color: #000;
+}
+
+.login-form-label {
+    font-size: 0.8rem; /* small */
+    text-transform: uppercase;
+    font-weight: 700; /* fw-bold */
+    color: #6c757d; /* text-muted */
+}
+
+.login-input {
+    padding: 12px;
+    border-radius: 4px;
+}
+
+.login-btn {
+    background-color: #000;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: background-color 0.3s ease;
+}
+
+.login-btn:hover {
+    background-color: #333;
+    color: #fff;
+}
+
+.login-register-link {
+    color: #CB171A; /* Hearth Red */
+    font-weight: bold;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.login-register-link:hover {
+    color: #a01215; /* Darker red */
+    text-decoration: underline;
+}
+/* --- PRODUCT CARD EXTRAS --- */
+
+/* 1. The Info Icon (Top Right of Image) */
+.product-image-wrapper {
+    position: relative; /* Essential for absolute positioning of the icon */
+    overflow: hidden;
+}
+
+.info-icon-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    font-weight: bold;
+    font-family: serif;
+    font-style: italic;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    border: none;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.info-icon-btn:hover {
+    background-color: #000;
+    color: #fff;
+    transform: scale(1.1);
+}
+
+/* 2. The Quantity Pill (- 0 +) */
+.quantity-pill {
+    display: flex;
+    align-items: center;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 50rem;
+    padding: 2px;
+    width: fit-content;
+}
+
+.qty-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    background-color: transparent;
+    font-weight: bold;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.qty-btn:hover {
+    background-color: #e9ecef;
+}
+
+.qty-display {
+    width: 30px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.9rem;
+    user-select: none;
+}
+
+/* --- CUSTOM ADD BUTTON (Double Layer Fix) --- */
+.btn-hearth-add {
+    /* Layout & Text */
+    display: inline-block;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    
+    /* Shape */
+    padding: 6px 1.5rem;
+    border-radius: 50px 25px 50px 50px !important; 
+    
+    /* Colors */
+    background: transparent; /* IMPORTANT: Transparent so we see the layers below */
+    color: #FFFFFF;
+    border: 2px solid #CB171A !important;
+    
+    /* Animation Essentials */
+    position: relative; 
+    overflow: hidden; 
+    z-index: 1; /* Establishes stacking context */
+    transition: color 0.4s ease-in-out; 
+}
+
+/* LAYER 1: The Permanent Red Background (Bottom) */
+.btn-hearth-add::after {
+    content: '';
+    position: absolute;
+    inset: 0; /* Stretches to fill the button */
+    background: #CB171A;
+    z-index: -2; /* Sits at the very bottom */
+    border-radius: inherit; /* Copies the parent's unique shape */
+}
+
+/* LAYER 2: The White Sweep (Middle) */
+.btn-hearth-add::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500%; 
+    height: 500%; 
+    background: #FFFFFF; 
+    z-index: -1; /* Sits above the Red BG (-2) but behind Text (auto) */
+    
+    /* Start position: Hidden to the right */
+    transform: translate(-50%, -50%) rotate(45deg) translateX(100%);
+    
+    /* Animation speed */
+    transition: transform 0.7s cubic-bezier(0.3, 1, 0.8, 1); /* Smoother sweep */
+}
+
+/* --- Hover State --- */
+.btn-hearth-add:hover {
+    color: #CB171A; /* Text turns RED */
+}
+
+.btn-hearth-add:hover::before {
+    /* Slide the white sweep in */
+    transform: translate(-50%, -50%) rotate(45deg) translateX(0); 
+}
+
+/* Active State */
+.btn-hearth-add:active {
+    filter: brightness(0.85); 
+    transition: filter 0.1s ease-out; 
+}
+
+/* --- NEW: CART PAGE STYLES (Moved from Inline) --- */
+
+.cart-header-title {
+    font-family: 'Libre Baskerville', serif;
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.cart-table-head th {
+    font-family: 'Libre Baskerville', serif;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-bottom: 2px solid #000;
+    padding-bottom: 15px;
+}
+
+.cart-row {
+    border-bottom: 1px solid #eee;
+}
+
+.cart-img-box {
+    width: 80px; 
+    height: 80px; 
+    overflow: hidden; 
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.cart-img-box img {
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover;
+}
+
+.cart-product-title {
+    font-family: 'Libre Baskerville', serif; 
+    font-size: 1rem; 
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #000;
+}
+
+.cart-product-desc {
+    font-size: 0.85rem;
+    color: #6c757d; /* text-muted */
+    display: block;
+    line-height: 1.4;
+}
+
+.cart-total-label {
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #6c757d;
+}
+
+.cart-total-amount {
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 700;
+    font-size: 2.5rem; /* display-6 size */
+}
+
+/* --- CART PAGE UTILITIES (Removed Inline Styles) --- */
+
+.cart-container {
+    min-height: 60vh; /* Was inline style */
+}
+
+.cart-empty-msg {
+    font-family: 'Libre Baskerville', serif; /* Was inline style */
+}
+
+/* Table Column Widths */
+.cart-col-product {
+    width: 10%;
+}
+
+.cart-col-desc {
+    width: 40%;
+}
+
+/* Checkout Button Text Size */
+.btn-checkout-custom {
+    font-size: 1rem !important; /* Was inline style */
+}
+
+/* Ensure the header row font is correct if not already set */
+.cart-table-head tr {
+    font-family: 'Libre Baskerville', serif;
+}
+/* --- SUCCESS PAGE STYLES --- */
+
+.success-container {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column; /* Forces vertical stacking */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 4rem;
+}
+
+.success-icon-wrapper {
+    width: 80px;
+    height: 80px;
+    background-color: #CB171A; /* Hearth Red */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.success-text {
+    max-width: 500px;
+    margin-bottom: 3rem;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 1.1rem;
+    color: #555;
+    
+    /* FIX: Override the 'margin-left: auto' from the menu styles */
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.order-box {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    min-width: 300px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 3rem;
+}
+
+.order-label {
+    display: block;
+    text-transform: uppercase;
+    color: #6c757d;
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+.order-number {
+    display: block;
+    font-family: 'Libre Baskerville', serif;
+    font-weight: 700;
+    font-size: 3rem;
+    color: #000;
+}
+
+/* --- BLACK SWEEP BUTTON (Return to Menu) --- */
+.btn-sweep-black {
+    /* Layout */
+    display: inline-block;
+    padding: 12px 40px;
+    text-decoration: none;
+    text-align: center;
+    
+    /* Font */
+    color: #000000;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    
+    /* Shape */
+    border: 2px solid #000000;
+    border-radius: 50px 25px 50px 50px; 
+    background: transparent;
+    
+    /* Animation Essentials */
+    position: relative; 
+    overflow: hidden; 
+    z-index: 1;
+    transition: color 0.4s ease-in-out;
+}
+
+/* The Sweep Element */
+.btn-sweep-black::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500%; /* Huge to cover the rotation */
+    height: 500%; 
+    background: #000000; /* Sweep to Black */
+    z-index: -1; 
+    transform: translate(-50%, -50%) rotate(45deg) translateX(100%); /* Start hidden */
+    transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
+}
+
+/* Hover State */
+.btn-sweep-black:hover {
+    color: #FFFFFF; /* Text turns White */
+}
+
+.btn-sweep-black:hover::before {
+    transform: translate(-50%, -50%) rotate(45deg) translateX(0); /* Sweep in */
+}
+
+/* "Repeat Order" Button Styles */
+.btn-hearth-repeat {
+    position: relative;
+    display: inline-block;
+    color: #CB171A;              /* Red text */
+    border: 2px solid #CB171A;   /* Red border */
+    background-color: transparent;
+    overflow: hidden;            /* Essential for the sweep effect */
+    transition: color 0.4s ease-in-out;
+    z-index: 1;
+    text-decoration: none;       /* Remove underline */
+    border-radius: 5px;          /* Match your other buttons */
+}
+
+/* The sweeping background layer */
+.btn-hearth-repeat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;                 /* Start off-screen to the left */
+    width: 100%;
+    height: 100%;
+    background-color: #CB171A;   /* Red background fill */
+    transition: left 0.4s ease-in-out;
+    z-index: -1;                 /* Put it behind the text */
+}
+
+/* Hover State */
+.btn-hearth-repeat:hover {
+    color: #ffffff;              /* Text turns white */
+}
+
+.btn-hearth-repeat:hover::before {
+    left: 0;                     /* Sweep in from left to right */
+}
+
+/* Icon Color Adjustment */
+.icon-red {
+    color: #CB171A;
+}
+
+/* "Repeat Order" Button Styles */
+.btn-hearth-repeat {
+    position: relative;
+    display: inline-block;
+    color: #CB171A;              /* Red text */
+    border: 2px solid #CB171A;   /* Red border */
+    background-color: transparent;
+    overflow: hidden;            /* Essential for the sweep effect */
+    transition: color 0.4s ease-in-out;
+    z-index: 1;
+    text-decoration: none;       /* Remove underline */
+    border-radius: 5px;          /* Match your other buttons */
+}
+
+/* The sweeping background layer */
+.btn-hearth-repeat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;                 /* Start off-screen to the left */
+    width: 100%;
+    height: 100%;
+    background-color: #CB171A;   /* Red background fill */
+    transition: left 0.4s ease-in-out;
+    z-index: -1;                 /* Put it behind the text */
+}
+
+/* Hover State */
+.btn-hearth-repeat:hover {
+    color: #ffffff;              /* Text turns white */
+}
+
+.btn-hearth-repeat:hover::before {
+    left: 0;                     /* Sweep in from left to right */
+}
+
+/* Icon Color Adjustment */
+.icon-red {
+    color: #CB171A;
+}
+/* --- REPEAT ORDER BUTTON --- */
+.btn-hearth-repeat {
+    /* Layout & Text */
+    display: inline-block;
+    font-weight: 700;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    font-size: 0.875rem; 
+    
+    /* Shape */
+    padding: 6px 1.5rem;
+    border-radius: 50px 25px 50px 50px !important; 
+    
+    /* Colors */
+    background: transparent; 
+    color: #FFFFFF;          
+    border: 2px solid #CB171A !important;
+    
+    /* Animation Essentials */
+    position: relative; 
+    overflow: hidden; 
+    z-index: 1; 
+    transition: color 0.4s ease-in-out; 
+    text-decoration: none;
+}
+
+/* LAYER 1: The Permanent Red Background (Bottom) */
+.btn-hearth-repeat::after {
+    content: '';
+    position: absolute;
+    inset: 0; 
+    background: #CB171A;
+    z-index: -2; 
+    border-radius: inherit; 
+}
+
+/* LAYER 2: The White Sweep (Middle) */
+.btn-hearth-repeat::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Increased size to 350% to ensure corners are fully covered */
+    width: 1200%; 
+    height: 1200%; 
+    background: #FFFFFF; 
+    z-index: -1; 
+    
+    /* LOGIC: 
+       1. Center the box (-50%, -50%)
+       2. Rotate -45deg (Y-axis now points to Bottom-Right)
+       3. TranslateY(100%) pushes it OUT to the Bottom-Right corner
+    */
+    transform: translate(-50%, -50%) rotate(-45deg) translateY(100%);
+    
+    /* Animation speed */
+    transition: transform 0.6s cubic-bezier(0.3, 1, 0.8, 1); 
+}
+
+/* --- Hover State --- */
+.btn-hearth-repeat:hover {
+    color: #CB171A; /* Text turns RED */
+}
+
+.btn-hearth-repeat:hover::before {
+    /* Slide the white sweep IN to the center (filling the button) */
+    transform: translate(-50%, -50%) rotate(-45deg) translateY(0); 
+}
+
+/* Active State */
+.btn-hearth-repeat:active {
+    filter: brightness(0.85); 
+    transition: filter 0.1s ease-out; 
+}
+
+.icon-red {
+    color: #CB171A;
+}
+
+/* Custom Red Outline Button (for forms/inputs) */
+.btn-outline-red {
+    color: var(--hearth-black) !important;
+    border: 1px solid #000000 !important;
+    background-color: transparent;
+    transition: all 0.3s ease-in-out;
+}
+
+.btn-outline-red:hover {
+    background-color: var(--hearth-red) !important;
+    color: var(--hearth-white) !important;
+    border: 1px solid #C21818;
+}
