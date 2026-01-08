@@ -30,13 +30,13 @@
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
-                            <th>Role/Category</th>
+                            <th>Category</th>
                             <th>Price</th>
                             <th>Status</th>
-                        </tr>
+                            <th>Actions</th> </tr>
                     </thead>
                     <tbody id="productsTableBody">
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
 
@@ -53,6 +53,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -81,6 +82,7 @@
                             <option value="Seafood">Seafood</option>
                             <option value="Wines">Wines</option>
                             <option value="Spirits">Spirits</option>
+                            <option value="Beverages">Beverages</option>
                             <option value="Sides">Sides</option>
                             <option value="Desserts">Desserts</option>
                         </select>
@@ -104,4 +106,5 @@
         </div>
     </div>
 </div>
+
 <script src="/DAW2/thehearth/public/js/admin.js"></script>

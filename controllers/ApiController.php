@@ -1,7 +1,6 @@
 <?php
 // Cargamos DAO
 require_once __DIR__ . '/../models/ProductDAO.php';
-// Añadiremos OrderDAO luego
 
 class ApiController {
 
@@ -14,8 +13,7 @@ class ApiController {
         }
     }
 
-    
-    //URL: index.php?controller=Api&action=products
+    // URL: index.php?controller=Api&action=products
     public function products() {
         $products = ProductDAO::getAllProducts();
         
@@ -28,7 +26,10 @@ class ApiController {
                 'description' => $p->getDescription(),
                 'price' => $p->getBasePrice(),
                 'category' => $p->getProductType(),
-                'available' => $p->getAvailable()
+                'available' => $p->getAvailable(),
+                
+                // --- FIX IS HERE: ADD THIS LINE ---
+                'image' => $p->getImage() 
             ];
         }
 
@@ -37,15 +38,8 @@ class ApiController {
         exit();
     }
     
-    //Aquí añadiremos "orders" y "logs" mas tarde
-
-    /**
-     * Action: Delete a Product
-     * Method: POST
-     * URL: index.php?controller=Api&action=delete_product
-     */
+    // Action: Delete a Product
     public function delete_product() {
-        // 1. Get the raw JSON input from JavaScript
         $input = json_decode(file_get_contents('php://input'), true);
         
         if (!isset($input['id'])) {
@@ -53,10 +47,8 @@ class ApiController {
             exit();
         }
 
-        // 2. Call the DAO
         $isDeleted = ProductDAO::delete($input['id']);
 
-        // 3. Respond
         header('Content-Type: application/json');
         if ($isDeleted) {
             echo json_encode(['success' => true]);
@@ -65,13 +57,9 @@ class ApiController {
         }
         exit();
     }
-    /**
-     * Action: Save Product (Create or Update)
-     * Method: POST
-     * URL: index.php?controller=Api&action=save_product
-     */
+
+    // Action: Save Product (Create or Update)
     public function save_product() {
-        // Get JSON input
         $input = json_decode(file_get_contents('php://input'), true);
 
         $id = isset($input['id']) ? $input['id'] : null;
@@ -79,7 +67,7 @@ class ApiController {
         $description = $input['description'];
         $category = $input['category'];
         $price = $input['price'];
-        $image = $input['image']; // In a real app, we would handle file uploads here
+        $image = $input['image']; 
 
         if ($id) {
             // --- UPDATE EXISTING ---
@@ -89,7 +77,7 @@ class ApiController {
             // --- CREATE NEW ---
             $newId = ProductDAO::insert($name, $description, $category, $price, $image);
             $success = $newId ? true : false;
-            $id = $newId; // Return the new ID to the frontend
+            $id = $newId; 
             $message = "Product created successfully";
         }
 
