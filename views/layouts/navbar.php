@@ -1,5 +1,5 @@
 <script>
-  // This creates a global variable that scripts.js can read
+  //variable global para scripts
   window.isUserLoggedIn = <?php echo isset($_SESSION['user_id']) ? 'true' : 'false'; ?>;
 </script>
 <nav class="navbar hearth-navbar">
@@ -18,7 +18,7 @@
             <hr class="dropdown-divider">
           </li>
         <?php endif; ?>
-
+        
         <li><a class="dropdown-item" href="index.php?controller=Home">Home Page</a></li>
         <li><a class="dropdown-item" href="index.php?controller=Product">Our Menu</a></li>
         <li><a class="dropdown-item" href="/location">Our Location</a></li>

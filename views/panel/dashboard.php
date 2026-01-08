@@ -1,28 +1,7 @@
 <div class="container-fluid py-4">
-    <style>
-        /* Table Sorting Styles */
-        .sortable {
-            cursor: pointer;
-            user-select: none;
-            position: relative;
-        }
-
-        .sortable:hover {
-            background-color: #444;
-            /* Slightly lighter than table-dark */
-            color: #fff;
-        }
-
-        .sortable::after {
-            content: ' ↕';
-            /* Visual indicator */
-            font-size: 0.8em;
-            opacity: 0.5;
-        }
-    </style>
-
     <div class="row">
 
+        <?php // menú lateral de navegación para el administrador ?>
         <div class="col-md-2">
             <div class="list-group">
                 <button class="list-group-item list-group-item-action menu-btn active" data-target="section-products">
@@ -42,6 +21,7 @@
 
         <div class="col-md-10">
 
+            <?php // sección para la gestión de productos (añadir, editar, borrar) ?>
             <div id="section-products" class="content-section">
                 <h2 class="mb-4" style="font-family: 'Libre Baskerville', serif;">Products Management</h2>
 
@@ -61,17 +41,17 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="productsTableBody">
-                    </tbody>
+                    <tbody id="productsTableBody"></tbody>
                 </table>
             </div>
 
+            <?php // sección para el control de pedidos de clientes ?>
             <div id="section-orders" class="content-section d-none">
                 <h2 class="mb-4" style="font-family: 'Libre Baskerville', serif;">Orders Management</h2>
 
                 <div class="d-flex justify-content-between mb-3">
                     <input type="text" id="searchOrderInput" class="form-control w-25" placeholder="Search Order ID...">
-                    <select class="form-select w-25" id="filterStatus">
+                    <select class="form-select w-25" id="filterStatus" onchange="filterOrders()">
                         <option value="all">All Statuses</option>
                         <option value="pending">Pending</option>
                         <option value="shipped">Shipped</option>
@@ -91,11 +71,11 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="ordersTableBody">
-                    </tbody>
+                    <tbody id="ordersTableBody"></tbody>
                 </table>
             </div>
 
+            <?php // historial de acciones administrativas (logs) ?>
             <div id="section-logs" class="content-section d-none">
                 <h2 class="mb-4" style="font-family: 'Libre Baskerville', serif;">System Logs</h2>
                 <p class="text-muted mb-4">Track administrative actions and system events.</p>
@@ -109,11 +89,11 @@
                             <th class="sortable" onclick="sortLogs('affected_entity')">Target</th>
                         </tr>
                     </thead>
-                    <tbody id="logsTableBody">
-                    </tbody>
+                    <tbody id="logsTableBody"></tbody>
                 </table>
             </div>
 
+            <?php // gestión de usuarios y asignación de roles de administrador ?>
             <div id="section-users" class="content-section d-none">
                 <h2 class="mb-4" style="font-family: 'Libre Baskerville', serif;">User Management</h2>
                 <p class="text-muted mb-4">View all registered users and manage their administrative roles.</p>
@@ -128,8 +108,7 @@
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="usersTableBody">
-                        </tbody>
+                    <tbody id="usersTableBody"></tbody>
                 </table>
             </div>
 
@@ -137,6 +116,7 @@
     </div>
 </div>
 
+<?php // modal para crear o editar productos ?>
 <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -147,17 +127,14 @@
             <div class="modal-body">
                 <form id="productForm">
                     <input type="hidden" id="prodId">
-
                     <div class="mb-3">
                         <label class="form-label">Name</label>
                         <input type="text" class="form-control" id="prodName" required>
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <textarea class="form-control" id="prodDesc" rows="3" placeholder="Enter product details..."></textarea>
+                        <textarea class="form-control" id="prodDesc" rows="3"></textarea>
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Category</label>
                         <select class="form-select" id="prodCategory" required>
@@ -170,15 +147,13 @@
                             <option value="Desserts">Desserts</option>
                         </select>
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Price ($)</label>
                         <input type="number" step="0.01" class="form-control" id="prodPrice" required>
                     </div>
-
                     <div class="mb-3">
                         <label class="form-label">Image Filename</label>
-                        <input type="text" class="form-control" id="prodImage" placeholder="img/steak.png" value="img/logo.svg">
+                        <input type="text" class="form-control" id="prodImage" value="img/logo.svg">
                     </div>
                 </form>
             </div>
@@ -190,6 +165,7 @@
     </div>
 </div>
 
+<?php // modal para ver y actualizar el detalle de los pedidos ?>
 <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -231,8 +207,7 @@
                             <th>Subtotal</th>
                         </tr>
                     </thead>
-                    <tbody id="modalOrderItems">
-                    </tbody>
+                    <tbody id="modalOrderItems"></tbody>
                 </table>
             </div>
             <div class="modal-footer">

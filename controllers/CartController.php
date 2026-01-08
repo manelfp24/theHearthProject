@@ -1,47 +1,55 @@
 <?php
-// controllers/CartController.php
+// controladores/CartController.php
+
+// cargamos los modelos necesarios para productos, pedidos y cupones
 require_once '../models/ProductDAO.php';
-// We need OrderDAO available for the index to check history
 require_once '../models/OrderDAO.php'; 
 
 class CartController {
 
+    // al crear el objeto, nos aseguramos de que la sesión esté iniciada
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
 
-    // ... [KEEP YOUR EXISTING add() FUNCTION HERE] ... 
-
+    // añade un producto al carrito desde la tienda
     public function add() {
-        // (Paste your existing add() code here exactly as it was)
         ob_clean(); 
+        // leemos los datos que vienen del javascript en formato json
         $input = json_decode(file_get_contents('php://input'), true);
         $productId = isset($input['id']) ? (int)$input['id'] : 0;
         $quantity  = isset($input['quantity']) ? (int)$input['quantity'] : 1;
+        
+        // si el id no es válido, avisamos del error
         if ($productId <= 0) { echo json_encode(['success' => false, 'message' => 'Invalid ID']); exit(); }
+        
+        // preparamos el carrito en la sesión si todavía no existe
         if (!isset($_SESSION['cart'])) { $_SESSION['cart'] = []; }
+        
+        // si el producto ya estaba, sumamos la cantidad; si no, lo añadimos
         if (isset($_SESSION['cart'][$productId])) { $_SESSION['cart'][$productId] += $quantity; } 
         else { $_SESSION['cart'][$productId] = $quantity; }
+        
+        // calculamos el total de objetos para actualizar el icono de la cesta
         $totalItems = array_sum($_SESSION['cart']);
         $_SESSION['cart_count'] = $totalItems;
+        
         header('Content-Type: application/json');
         echo json_encode(['success' => true, 'newCount' => $totalItems]);
         exit();
     }
 
-    /**
-     * Action: Show the Cart Page
-     */
+    // muestra la página principal del carrito con todos los detalles
     public function index() {
-        // 1. Get keys (Product IDs) from session
+        // obtenemos los ids de los productos guardados en la sesión
         $cartIds = isset($_SESSION['cart']) ? array_keys($_SESSION['cart']) : [];
         
         $cartItems = [];
         $cartTotal = 0;
 
-        // 2. Fetch full product details for each item
+        // recorremos los ids para sacar la información real de la base de datos
         foreach ($cartIds as $id) {
             $product = ProductDAO::getProductById($id);
             
@@ -49,24 +57,25 @@ class CartController {
                 $qty = $_SESSION['cart'][$id];
                 $lineTotal = $product->getBasePrice() * $qty;
                 
+                // guardamos la info procesada en un array para la vista
                 $cartItems[] = [
                     'product' => $product,
                     'quantity' => $qty,
                     'line_total' => $lineTotal
                 ];
                 
+                // vamos sumando el total acumulado del carrito
                 $cartTotal += $lineTotal;
             }
         }
 
-        // ... (inside index method, after calculating $cartTotal) ...
-
-        // Check if coupon is applied
+        // lógica para aplicar descuentos si hay un cupón activo
         $discountAmount = 0;
         $finalTotal = $cartTotal;
         
         if (isset($_SESSION['applied_coupon'])) {
             $coupon = $_SESSION['applied_coupon'];
+            // calculamos si el descuento es por porcentaje o cantidad fija
             if ($coupon['type'] == 'percentage') {
                 $discountAmount = $cartTotal * ($coupon['value'] / 100);
             } else {
@@ -75,29 +84,26 @@ class CartController {
             $finalTotal = $cartTotal - $discountAmount;
         }
 
-
-        // --- NEW LOGIC FOR RE-ORDER BUTTON ---
-        // We check this separately so we can show the button even if cart is empty
+        // comprobamos si el usuario tiene pedidos antiguos para mostrar el botón de repetir
         $hasPreviousOrder = false;
         if (isset($_SESSION['user_id'])) {
-            // Check if this user has ordered before
             $hasPreviousOrder = OrderDAO::hasPreviousOrder($_SESSION['user_id']);
         }
 
-        // 3. Load the View
+        // cargamos el archivo de la vista para mostrar el carrito al usuario
         require_once '../views/cart/index.php'; 
     }
 
-    // ... [KEEP YOUR update_quantity(), remove(), and checkout() HERE] ...
-    
+    // permite subir o bajar la cantidad de un objeto desde el carrito
     public function update_quantity() {
-        // (Paste your existing update_quantity code)
         if (ob_get_length()) ob_clean();
         $input = json_decode(file_get_contents('php://input'), true);
         $id = isset($input['id']) ? (int)$input['id'] : 0;
         $change = isset($input['change']) ? (int)$input['change'] : 0;
+        
         if (isset($_SESSION['cart'][$id])) {
             $_SESSION['cart'][$id] += $change;
+            // si la cantidad llega a cero o menos, quitamos el producto
             if ($_SESSION['cart'][$id] <= 0) { unset($_SESSION['cart'][$id]); }
             $_SESSION['cart_count'] = array_sum($_SESSION['cart']);
             echo json_encode(['success' => true]);
@@ -105,11 +111,12 @@ class CartController {
         exit();
     }
 
+    // elimina un producto del carrito completamente
     public function remove() {
-        // (Paste your existing remove code)
         if (ob_get_length()) ob_clean();
         $input = json_decode(file_get_contents('php://input'), true);
         $id = isset($input['id']) ? (int)$input['id'] : 0;
+        
         if (isset($_SESSION['cart'][$id])) {
             unset($_SESSION['cart'][$id]);
             $_SESSION['cart_count'] = array_sum($_SESSION['cart']);
@@ -118,39 +125,33 @@ class CartController {
         exit();
     }
 
-    /**
-     * Action: Show the Checkout Form (Address & Payment)
-     */
+    // muestra la página de confirmación de dirección y pago
     public function checkout() {
-        // Security: Cart cannot be empty
+        // si el carrito está vacío, no dejamos entrar y volvemos a la tienda
         if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
             header("Location: index.php?controller=Product");
             exit();
         }
 
-        // Just load the view
+        // cargamos la vista del formulario de pago
         require_once '../views/cart/checkout.php';
     }
 
-    /**
-     * Action: Handle the form submission and save to DB
-     */
-    // controllers/CartController.php
-
+    // procesa el pedido final y lo guarda en la base de datos
     public function processOrder() {
         require_once '../models/OrderDAO.php';
 
-        // 1. Security Check
+        // comprobación de seguridad para evitar pedidos vacíos
         if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
             header("Location: index.php?controller=Product");
             exit();
         }
 
-        // 2. Prepare Items & Calculate Initial Subtotal
         $cartIds = array_keys($_SESSION['cart']);
         $cartItems = [];
-        $calculatedSubtotal = 0; // This is the price BEFORE discount
+        $calculatedSubtotal = 0; 
 
+        // preparamos los productos para guardarlos en la base de datos
         foreach ($cartIds as $id) {
             $product = ProductDAO::getProductById($id);
             if ($product) {
@@ -165,58 +166,52 @@ class CartController {
             }
         }
 
-        // 3. Handle Coupon Logic
-        $couponId = null;        // Default: NULL in DB
-        $discountAmount = 0.00;  // Default: 0.00
+        // inicializamos las variables del cupón por si no se usa ninguno
+        $couponId = null;        
+        $discountAmount = 0.00;  
         $finalPrice = $calculatedSubtotal;
 
+        // aplicamos los descuentos del cupón al precio final si existen
         if (isset($_SESSION['applied_coupon'])) {
              $coupon = $_SESSION['applied_coupon'];
-             
-             // Save the ID to send to DB
              $couponId = $coupon['id']; 
 
-             // Calculate Discount
              if ($coupon['type'] == 'percentage') {
                  $discountAmount = $calculatedSubtotal * ($coupon['value'] / 100);
              } else {
                  $discountAmount = $coupon['value'];
              }
-             
-             // Calculate Final Price
              $finalPrice = max(0, $calculatedSubtotal - $discountAmount);
         }
 
-        // 4. Get User Info
         $userId = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-        // 5. Save to Database (Passing new variables!)
-        // function createOrder($userId, $cartItems, $totalPrice, $couponId, $discountAmount)
+        // mandamos toda la info al dao para crear el registro en la base de datos
         $orderId = OrderDAO::createOrder($userId, $cartItems, $finalPrice, $couponId, $discountAmount);
 
         if ($orderId) {
-            // Cleanup Session
+            // limpiamos el carrito y el cupón de la sesión tras el éxito
             unset($_SESSION['cart']);
             unset($_SESSION['cart_count']);
-            unset($_SESSION['applied_coupon']); // Important: clear the used coupon
+            unset($_SESSION['applied_coupon']); 
             
             $_SESSION['last_order_id'] = $orderId;
             
+            // vamos a la página de agradecimiento
             header("Location: index.php?controller=Cart&action=success");
             exit();
         } else {
-            // Optional: Log error or show message
             echo "Error processing order. Please try again.";
         }
     }
 
+    // muestra el mensaje de que el pedido se ha realizado correctamente
     public function success() {
         require_once '../views/cart/success.php';
     }
 
-    // --- REPEAT ORDER FUNCTION ---
+    // recupera los productos del último pedido y los mete al carrito actual
     public function repeatLastOrder() {
-        // 1. Security check
         if (!isset($_SESSION['user_id'])) {
             header("Location: index.php?controller=User&action=login");
             exit();
@@ -224,12 +219,10 @@ class CartController {
     
         $userId = $_SESSION['user_id'];
         
-        // 2. Fetch the LAST order items using the STATIC method we made
-        // Note: Using static :: call, not new OrderDAO()
+        // buscamos los productos del pedido más reciente de este usuario
         $lastOrderItems = OrderDAO::getMostRecentOrderItems($userId);
     
         if (!empty($lastOrderItems)) {
-            
             if (!isset($_SESSION['cart'])) {
                 $_SESSION['cart'] = [];
             }
@@ -238,7 +231,7 @@ class CartController {
                 $productId = $item['product_id'];
                 $quantity = $item['quantity'];
     
-                // Logic to merge: Add to existing quantity if item is already in cart
+                // si ya estaban en el carrito, sumamos la cantidad antigua a la nueva
                 if (isset($_SESSION['cart'][$productId])) {
                     $_SESSION['cart'][$productId] += $quantity;
                 } else {
@@ -246,22 +239,18 @@ class CartController {
                 }
             }
             
-            // Update count for the badge
+            // actualizamos el contador visual del carrito
             $_SESSION['cart_count'] = array_sum($_SESSION['cart']);
         }
     
-        // 4. Redirect back to Cart view
         header("Location: index.php?controller=Cart");
         exit();
     }
 
-    /**
-     * Action: Apply Coupon (AJAX)
-     */
+    // verifica y activa un cupón de descuento mediante ajax
     public function applyCoupon() {
         require_once '../models/DiscountDAO.php';
         
-        // Clean buffer
         if (ob_get_length()) ob_clean();
         header('Content-Type: application/json');
 
@@ -273,7 +262,7 @@ class CartController {
             exit();
         }
 
-        // 1. Validate Code
+        // comprobamos en la base de datos si el código es válido
         $discount = DiscountDAO::getValidDiscount($code);
 
         if (!$discount) {
@@ -281,16 +270,15 @@ class CartController {
             exit();
         }
 
-        // 2. Save to Session
+        // guardamos la info del cupón en la sesión para el checkout
         $_SESSION['applied_coupon'] = [
             'id' => $discount['discount_code_id'],
             'code' => $discount['code'],
             'value' => (float)$discount['discount_value'],
-            'type' => $discount['discount_type'] // 'percentage' or 'fixed'
+            'type' => $discount['discount_type'] 
         ];
 
-        // 3. Recalculate Totals immediately to send back
-        // (Simplified calculation logic for the response)
+        // recalculamos los totales para responder al javascript rápidamente
         $cartTotal = 0;
         foreach ($_SESSION['cart'] as $id => $qty) {
             $prod = ProductDAO::getProductById($id);
@@ -306,6 +294,7 @@ class CartController {
         
         $finalTotal = max(0, $cartTotal - $discountAmount);
 
+        // enviamos la respuesta de éxito y los nuevos precios calculados
         echo json_encode([
             'success' => true, 
             'message' => 'Coupon applied!',
@@ -315,9 +304,7 @@ class CartController {
         exit();
     }
     
-    /**
-     * Action: Remove Coupon (Optional but recommended)
-     */
+    // permite al usuario quitar el cupón si decide no usarlo
     public function removeCoupon() {
         if (isset($_SESSION['applied_coupon'])) {
             unset($_SESSION['applied_coupon']);

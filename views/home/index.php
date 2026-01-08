@@ -1,19 +1,17 @@
 <?php 
-// 1. Load the Database Connection
-require_once __DIR__ . '/../../config/Database.php'; // Adjust path if needed
+// Cargamos la bbdd
+require_once __DIR__ . '/../../config/Database.php';
 
-// 2. Connect
+// conectamos a bbdd
 $conn = Database::connect();
 
-// 3. Fetch "Signature Cuts" (Meats)
+// cogemos los signature cuts de la bbdd
 $sql_meats = "SELECT * FROM product WHERE product_type = 'Meats' AND is_featured = 1";
 $result_meats = $conn->query($sql_meats);
 
-// 4. Fetch "Drinks" (Spirits & Wines)
+// cogemos bebidas de la bbdd
 $sql_drinks = "SELECT * FROM product WHERE product_type IN ('Spirits', 'Wines') AND is_featured = 1";
 $result_drinks = $conn->query($sql_drinks);
-
-// 5. Load the HTML Setup
 // include __DIR__ . '/../layouts/header.php'; 
 // include __DIR__ . '/../layouts/navbar.php'; 
 ?>

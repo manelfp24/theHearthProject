@@ -1,13 +1,14 @@
 <?php
-// Cargamos DAOs
+
+// cargamos los daos necesarios para interactuar con la base de datos
 require_once __DIR__ . '/../models/ProductDAO.php';
 require_once __DIR__ . '/../models/OrderDAO.php';
-require_once __DIR__ . '/../models/LogDAO.php'; // <--- Added LogDAO
+require_once __DIR__ . '/../models/LogDAO.php'; 
 
 class ApiController {
 
     public function __construct() {
-        // Solo los admins pueden acceder a la API
+        // seguridad para que solo los administradores puedan usar estas funciones
         if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
             header('Content-Type: application/json');
             echo json_encode(['error' => 'Unauthorized']);
@@ -16,14 +17,15 @@ class ApiController {
     }
 
     // ---------------------------------------------------------
-    // 1. PRODUCTS
+    // 1. productos
     // ---------------------------------------------------------
 
-    // URL: index.php?controller=Api&action=products
+    // devuelve la lista de todos los productos en formato json
     public function products() {
         $products = ProductDAO::getAllProducts();
         
         $data = [];
+        // recorremos los productos para preparar los datos exactos que necesita el js
         foreach ($products as $p) {
             $data[] = [
                 'id' => $p->getProductId(),
@@ -41,8 +43,9 @@ class ApiController {
         exit();
     }
     
-    // Action: Delete a Product
+    // elimina un producto recibiendo su id mediante json
     public function delete_product() {
+        // leemos el contenido que llega en el cuerpo de la petición
         $input = json_decode(file_get_contents('php://input'), true);
         
         if (!isset($input['id'])) {
@@ -54,8 +57,8 @@ class ApiController {
 
         header('Content-Type: application/json');
         if ($isDeleted) {
-            // LOG THE ACTION
-            $adminId = $_SESSION['user_id'] ?? 1; // Default to 1 if session missing
+            // guardamos el rastro de la eliminación en la tabla de logs
+            $adminId = $_SESSION['user_id'] ?? 1; 
             LogDAO::logAction($adminId, 'Deleted Product', "Product ID: " . $input['id']);
 
             echo json_encode(['success' => true]);
@@ -65,7 +68,7 @@ class ApiController {
         exit();
     }
 
-    // Action: Save Product (Create or Update)
+    // sirve tanto para crear un producto nuevo como para actualizar uno existente
     public function save_product() {
         $input = json_decode(file_get_contents('php://input'), true);
 
@@ -79,22 +82,22 @@ class ApiController {
         $adminId = $_SESSION['user_id'] ?? 1;
 
         if ($id) {
-            // --- UPDATE EXISTING ---
+            // si hay id, significa que estamos editando un producto que ya existe
             $success = ProductDAO::update($id, $name, $description, $category, $price, $image);
             $message = "Product updated successfully";
             
-            // LOG UPDATE
+            // registramos el cambio en el historial de logs
             if($success) {
                 LogDAO::logAction($adminId, 'Updated Product', "Product: $name (ID: $id)");
             }
         } else {
-            // --- CREATE NEW ---
+            // si no hay id, creamos un registro nuevo en la base de datos
             $newId = ProductDAO::insert($name, $description, $category, $price, $image);
             $success = $newId ? true : false;
             $id = $newId; 
             $message = "Product created successfully";
 
-            // LOG CREATION
+            // registramos la creación en los logs
             if($success) {
                 LogDAO::logAction($adminId, 'Created Product', "Product: $name");
             }
@@ -110,13 +113,10 @@ class ApiController {
     }
 
     // ---------------------------------------------------------
-    // 2. ORDERS
+    // 2. pedidos
     // ---------------------------------------------------------
 
-    /**
-     * URL: index.php?controller=Api&action=orders
-     * Returns all orders with their items
-     */
+    // obtiene todos los pedidos incluyendo los productos que hay dentro de cada uno
     public function orders() {
         $orders = OrderDAO::getAllOrdersWithItems();
         
@@ -125,9 +125,7 @@ class ApiController {
         exit();
     }
 
-    /**
-     * URL: index.php?controller=Api&action=update_order_status
-     */
+    // cambia el estado de un pedido (ej: de pendiente a enviado)
     public function update_order_status() {
         $input = json_decode(file_get_contents('php://input'), true);
 
@@ -136,10 +134,9 @@ class ApiController {
             exit();
         }
 
-        // Update DB
         $success = OrderDAO::updateStatus($input['id'], $input['status']);
 
-        // LOG STATUS CHANGE
+        // guardamos en los logs quién ha cambiado el estado del pedido
         if($success) {
             $adminId = $_SESSION['user_id'] ?? 1;
             LogDAO::logAction($adminId, 'Updated Order Status', "Order #{$input['id']} changed to {$input['status']}");
@@ -151,23 +148,22 @@ class ApiController {
     }
 
     // ---------------------------------------------------------
-    // 3. LOGS (NEW SECTION)
+    // 3. historial (logs)
     // ---------------------------------------------------------
 
-    /**
-     * URL: index.php?controller=Api&action=logs
-     * Returns all admin logs
-     */
+    // devuelve todos los registros de acciones realizadas por los administradores
     public function logs() {
         $logs = LogDAO::getAllLogs();
         header('Content-Type: application/json');
         echo json_encode($logs);
         exit();
     }
-    //USERS
-    /**
-     * URL: index.php?controller=Api&action=users
-     */
+
+    // ---------------------------------------------------------
+    // 4. usuarios
+    // ---------------------------------------------------------
+
+    // lista todos los usuarios registrados en el sistema
     public function users() {
         $users = UserDAO::getAllUsers();
         header('Content-Type: application/json');
@@ -175,9 +171,7 @@ class ApiController {
         exit();
     }
 
-    /**
-     * URL: index.php?controller=Api&action=update_user_role
-     */
+    // permite al admin cambiar el rango de un usuario (ej: pasar de cliente a admin)
     public function update_user_role() {
         $input = json_decode(file_get_contents('php://input'), true);
         if (!isset($input['id']) || !isset($input['role'])) {
@@ -187,6 +181,7 @@ class ApiController {
 
         $success = UserDAO::updateRole($input['id'], $input['role']);
         
+        // registramos el cambio de rol en el historial de acciones
         if($success) {
             $adminId = $_SESSION['user_id'] ?? 1;
             LogDAO::logAction($adminId, 'Updated User Role', "User ID: {$input['id']} changed to {$input['role']}");

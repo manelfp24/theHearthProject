@@ -1,20 +1,24 @@
 <?php
+// cargamos la configuración para conectar con la base de datos
 require_once __DIR__ . '/../config/database.php';
 
 class OrderDAO {
     
     // ---------------------------------------------------------
-    // EXISTING FUNCTIONS (For Checkout & User Profile)
+    // funciones para el proceso de compra y el perfil de usuario
     // ---------------------------------------------------------
 
+    // registra un nuevo pedido en la base de datos procesando el carrito y los descuentos
     public static function createOrder($userId, $cartItems, $totalPrice, $couponId = null, $discountAmount = 0.00) {
         $con = Database::connect();
+        // iniciamos una transacción para asegurar que se guarde todo o nada
         $con->begin_transaction();
 
         try {
+            // calculamos el subtotal sumando el descuento al precio final
             $subtotal = $totalPrice + $discountAmount;
 
-            // Table: customer_order
+            // insertamos los datos generales en la tabla de pedidos principales
             $stmt = $con->prepare("INSERT INTO customer_order 
                 (user_id, coupon_used_id, subtotal, total_discount, total_price, status, order_date) 
                 VALUES (?, ?, ?, ?, ?, 'pending', NOW())");
@@ -22,10 +26,11 @@ class OrderDAO {
             $stmt->bind_param("iiddd", $userId, $couponId, $subtotal, $discountAmount, $totalPrice);
             
             $stmt->execute();
+            // obtenemos el id generado para este pedido
             $orderId = $con->insert_id;
             $stmt->close();
 
-            // Table: order_line
+            // insertamos cada producto del carrito en la tabla de líneas de pedido
             $stmtLine = $con->prepare("INSERT INTO order_line (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)");
             
             foreach ($cartItems as $item) {
@@ -39,20 +44,24 @@ class OrderDAO {
             }
             $stmtLine->close();
 
+            // si todo ha ido bien, confirmamos los cambios en la base de datos
             $con->commit();
             $con->close();
             return $orderId;
 
         } catch (Exception $e) {
+            // si hay cualquier error, deshacemos todos los cambios para no dejar datos corruptos
             $con->rollback();
             $con->close();
             return false;
         }
     }
 
+    // busca los productos del último pedido realizado por un usuario concreto
     public static function getMostRecentOrderItems($userId) {
         $con = Database::connect();
         
+        // consulta con subquery para encontrar los artículos del pedido más nuevo
         $sql = "SELECT ol.product_id, ol.quantity 
                 FROM order_line ol
                 WHERE ol.order_id = (
@@ -72,6 +81,7 @@ class OrderDAO {
         $result = $stmt->get_result();
         
         $items = [];
+        // guardamos cada producto encontrado en un array
         while ($row = $result->fetch_assoc()) {
             $items[] = $row;
         }
@@ -82,6 +92,7 @@ class OrderDAO {
         return $items; 
     }
 
+    // comprueba rápidamente si un usuario ha realizado alguna compra anteriormente
     public static function hasPreviousOrder($userId) {
         $con = Database::connect();
         
@@ -90,6 +101,7 @@ class OrderDAO {
         $stmt->execute();
         $stmt->store_result();
         
+        // devolvemos verdadero si encontramos al menos una fila
         $exists = $stmt->num_rows > 0;
         
         $stmt->close();
@@ -99,17 +111,14 @@ class OrderDAO {
     }
 
     // ---------------------------------------------------------
-    // NEW FUNCTIONS (FOR ADMIN DASHBOARD)
+    // funciones nuevas para el panel de administración
     // ---------------------------------------------------------
 
-    /**
-     * Returns all orders joined with their items using your DB structure:
-     * Tables: customer_order, order_line, product
-     */
+    // obtiene todos los pedidos del sistema detallando los productos de cada uno
     public static function getAllOrdersWithItems() {
         $con = Database::connect();
         
-        // We select the correct columns based on your SQL dump
+        // unimos las tablas de pedidos, líneas y productos para tener toda la información
         $sql = "SELECT 
                     o.order_id, 
                     o.user_id, 
@@ -132,7 +141,7 @@ class OrderDAO {
             while ($row = $result->fetch_assoc()) {
                 $id = $row['order_id'];
 
-                // If first time seeing this order, initialize it
+                // si es la primera vez que leemos este pedido, creamos su estructura base
                 if (!isset($ordersMap[$id])) {
                     $ordersMap[$id] = [
                         'id' => $id,
@@ -144,7 +153,7 @@ class OrderDAO {
                     ];
                 }
 
-                // Add the item details
+                // añadimos los detalles del producto a la lista de artículos del pedido
                 $ordersMap[$id]['items'][] = [
                     'product_name' => $row['product_name'],
                     'quantity' => $row['quantity'],
@@ -156,18 +165,15 @@ class OrderDAO {
 
         $con->close();
         
-        // Reset array keys to be 0,1,2... for clean JSON
+        // devolvemos solo los valores para que el json sea una lista limpia
         return array_values($ordersMap);
     }
 
-    /**
-     * Updates order status (e.g., pending -> shipped)
-     */
+    // permite cambiar el estado de un pedido (por ejemplo, marcarlo como enviado)
     public static function updateStatus($orderId, $newStatus) {
         $con = Database::connect();
         
-        // Table: customer_order
-        // Column: status
+        // actualizamos la columna de estado filtrando por el id del pedido
         $stmt = $con->prepare("UPDATE customer_order SET status = ? WHERE order_id = ?");
         $stmt->bind_param("si", $newStatus, $orderId);
         
@@ -179,9 +185,7 @@ class OrderDAO {
         return $success;
     }
 
-    /**
-     * Fetches the last N orders for a specific user
-     */
+    // recupera un número determinado de pedidos recientes de un usuario específico
     public static function getLastOrdersByUser($userId, $limit = 3) {
         $con = Database::connect();
         
@@ -197,6 +201,7 @@ class OrderDAO {
         $result = $stmt->get_result();
         
         $orders = [];
+        // llenamos el array con los resultados obtenidos
         while ($row = $result->fetch_assoc()) {
             $orders[] = $row;
         }

@@ -1,8 +1,10 @@
 <div class="container py-5">
     <div class="row">
+        <?php // columna izquierda: tarjeta de perfil y navegación lateral ?>
         <div class="col-md-3">
             <div class="card border-0 shadow-sm p-3">
                 <div class="text-center mb-3">
+                    <?php // avatar generado con la inicial del nombre en mayúscula ?>
                     <div class="profile-avatar">
                         <?= strtoupper(substr($user->name, 0, 1)) ?>
                     </div>
@@ -17,6 +19,7 @@
                     <a href="#orders" class="list-group-item list-group-item-action border-0">
                         <i class="bi bi-bag me-2"></i> My Orders
                     </a>
+                    <?php // enlace para cerrar la sesión de forma segura ?>
                     <a href="index.php?controller=User&action=logout" class="list-group-item list-group-item-action border-0 text-danger mt-3">
                         <i class="bi bi-box-arrow-right me-2"></i> Log Out
                     </a>
@@ -24,10 +27,13 @@
             </div>
         </div>
 
+        <?php // columna derecha: gestión de datos y pedidos ?>
         <div class="col-md-9">
+            <?php // sección para actualizar la información personal ?>
             <div id="info" class="card border-0 shadow-sm p-4 mb-4">
                 <h4 class="mb-4 profile-title">Personal Information</h4>
 
+                <?php // mensaje de confirmación cuando el perfil se actualiza correctamente ?>
                 <?php if (isset($_GET['success'])): ?>
                     <div class="alert alert-success py-2 small">Profile updated successfully!</div>
                 <?php endif; ?>
@@ -49,9 +55,11 @@
                 </form>
             </div>
 
+            <?php // sección que muestra el resumen de compras recientes ?>
             <div id="orders" class="card border-0 shadow-sm p-4">
                 <h4 class="mb-4 profile-title">Recent Orders</h4>
 
+                <?php // comprobamos si el usuario tiene historial de compras ?>
                 <?php if (empty($recentOrders)): ?>
                     <div class="alert alert-light border text-center py-4">
                         <i class="bi bi-cart-x fs-2"></i>
@@ -68,10 +76,12 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <?php // listamos los últimos pedidos realizados ?>
                                 <?php foreach ($recentOrders as $order): ?>
                                     <tr>
                                         <td><strong>#<?= $order['order_id'] ?></strong></td>
                                         <td><?= date('d M Y', strtotime($order['order_date'])) ?></td>
+                                        <?php // el atributo data-usd permite que el conversor dinámico funcione aquí también ?>
                                         <td class="fw-bold product-price" data-usd="<?= $order['total_price'] ?>">
                                             $<?= number_format($order['total_price'], 2) ?>
                                         </td>

@@ -1,66 +1,70 @@
 <?php
-// 1. Output Buffering (Keeps HTML in memory)
+// activamos el almacenamiento en el búfer de salida para evitar errores de envío de cabeceras
 ob_start();
 
-// 2.iniciamos sesion
+// iniciamos o recuperamos la sesión actual del usuario
 session_start();
-// public/index.php
+
+// cargamos todos los controladores necesarios para que el router pueda usarlos
 require_once '../controllers/ProductController.php';
 require_once '../controllers/UserController.php';
 require_once '../controllers/AdminController.php';
-// ADD THIS LINE:
 require_once '../controllers/CartController.php';
 
-// Initialize cart count if it doesn't exist
+// si es la primera vez que entra el usuario, ponemos el contador del carrito a cero
 if (!isset($_SESSION['cart_count'])) {
     $_SESSION['cart_count'] = 0;
 }
 
-// 3.incluimos bbdd
+// cargamos el archivo que permite conectar con la base de datos mysql
 require_once '../config/Database.php';
 
-// 4. ROUTER LOGIC (Moved up!)
-// We need to know WHICH controller is requested BEFORE we decide to load the header
+// lógica del enrutador: decidimos qué página mostrar basándonos en la url
+// si no se pide nada, por defecto cargamos el controlador home y la acción index
 $controllerName = isset($_GET['controller']) ? $_GET['controller'] : 'Home';
 $actionName     = isset($_GET['action']) ? $_GET['action'] : 'index';
 
-// CHECK: Is this an API request?
+// comprobamos si lo que se está pidiendo es una respuesta de la api
 $isApi = ($controllerName === 'Api');
 
-// 5. LOAD HEADER & NAVBAR (Only if NOT API)
+// cargamos la cabecera y el menú de navegación solo si el usuario está viendo la web (no en la api)
 if (!$isApi) {
     require_once '../views/layouts/header.php';
     require_once '../views/layouts/navbar.php';
 }
 
-// 6. EXECUTE CONTROLLER
+// construimos el nombre de la clase del controlador (ej: productcontroller)
 $controllerClassName = ucfirst($controllerName) . 'Controller';
 $controllerFile = '../controllers/' . $controllerClassName . '.php';
 
+// verificamos que el archivo del controlador solicitado exista en nuestra carpeta
 if (file_exists($controllerFile)) {
     require_once $controllerFile;
 
+    // si la clase existe, creamos el objeto y ejecutamos la función (acción) solicitada
     if (class_exists($controllerClassName)) {
         $controller = new $controllerClassName();
         if (method_exists($controller, $actionName)) {
-            // Execute the action (e.g., get products)
+            // ejecutamos la lógica (ej: mostrar productos o procesar login)
             $controller->{$actionName}();
         } else {
-            // Error handling (Only show HTML error if NOT API)
+            // error si la función no existe dentro del controlador
             if (!$isApi) echo "<div class='container py-5 text-white'>Error: Action not found.</div>";
         }
     } else {
+        // error si la clase no se ha definido correctamente
         if (!$isApi) echo "<div class='container py-5 text-white'>Error: Class not found.</div>";
     }
 } else {
+    // si el archivo no existe, mostramos un error 404 de página no encontrada
     if (!$isApi) echo "<div class='container py-5 text-center text-white'><h1>404</h1><p>Page not found</p></div>";
 }
 
-// 7. LOAD FOOTER (Only if NOT API)
+// cargamos el pie de página solo si no es una petición de datos api
 if (!$isApi) {
     require_once '../views/layouts/footer.php';
 }
 
-// 8. Flush Buffer
+// enviamos todo el contenido acumulado al navegador del usuario
 ob_end_flush();
 ?>

@@ -1,3 +1,6 @@
+<?php
+// iniciamos el contenedor principal de la página de éxito
+?>
 <div class="container success-container">
     
     <div class="success-icon-wrapper">
@@ -13,6 +16,9 @@
     <div class="order-box">
         <span class="order-label">Order Number</span>
         <span class="order-number">
+            <?php 
+            // recuperamos el id del pedido de la sesión para mostrarlo al usuario 
+            ?>
             #<?= isset($_SESSION['last_order_id']) ? $_SESSION['last_order_id'] : '---' ?>
         </span>
     </div>
