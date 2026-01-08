@@ -71,5 +71,27 @@ class UserDAO {
         
         return $success;
     }
+
+    public static function getAllUsers() {
+        $con = Database::connect();
+        $sql = "SELECT user_id, name, email, role FROM user ORDER BY user_id ASC";
+        $result = $con->query($sql);
+        $users = [];
+        while ($row = $result->fetch_assoc()) {
+            $users[] = $row;
+        }
+        $con->close();
+        return $users;
+    }
+
+    public static function updateRole($id, $newRole) {
+        $con = Database::connect();
+        $stmt = $con->prepare("UPDATE user SET role = ? WHERE user_id = ?");
+        $stmt->bind_param("si", $newRole, $id);
+        $success = $stmt->execute();
+        $stmt->close();
+        $con->close();
+        return $success;
+    }
 }
 ?>

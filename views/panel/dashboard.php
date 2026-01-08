@@ -6,12 +6,16 @@
             user-select: none;
             position: relative;
         }
+
         .sortable:hover {
-            background-color: #444; /* Slightly lighter than table-dark */
+            background-color: #444;
+            /* Slightly lighter than table-dark */
             color: #fff;
         }
+
         .sortable::after {
-            content: ' ↕'; /* Visual indicator */
+            content: ' ↕';
+            /* Visual indicator */
             font-size: 0.8em;
             opacity: 0.5;
         }
@@ -29,6 +33,9 @@
                 </button>
                 <button class="list-group-item list-group-item-action menu-btn" data-target="section-logs">
                     <i class="bi bi-journal-text"></i> Logs
+                </button>
+                <button class="list-group-item list-group-item-action menu-btn" data-target="section-users">
+                    <i class="bi bi-people"></i> Users
                 </button>
             </div>
         </div>
@@ -51,16 +58,17 @@
                             <th class="sortable" onclick="sortProducts('category')">Category</th>
                             <th class="sortable" onclick="sortProducts('price')">Price</th>
                             <th class="sortable" onclick="sortProducts('available')">Status</th>
-                            <th>Actions</th> </tr>
+                            <th>Actions</th>
+                        </tr>
                     </thead>
                     <tbody id="productsTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
 
             <div id="section-orders" class="content-section d-none">
                 <h2 class="mb-4" style="font-family: 'Libre Baskerville', serif;">Orders Management</h2>
-                
+
                 <div class="d-flex justify-content-between mb-3">
                     <input type="text" id="searchOrderInput" class="form-control w-25" placeholder="Search Order ID...">
                     <select class="form-select w-25" id="filterStatus">
@@ -80,10 +88,11 @@
                             <th class="sortable" onclick="sortOrders('user_id')">User ID</th>
                             <th class="sortable" onclick="sortOrders('total')">Total</th>
                             <th class="sortable" onclick="sortOrders('status')">Status</th>
-                            <th>Actions</th> </tr>
+                            <th>Actions</th>
+                        </tr>
                     </thead>
                     <tbody id="ordersTableBody">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
 
@@ -101,6 +110,25 @@
                         </tr>
                     </thead>
                     <tbody id="logsTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="section-users" class="content-section d-none">
+                <h2 class="mb-4" style="font-family: 'Libre Baskerville', serif;">User Management</h2>
+                <p class="text-muted mb-4">View all registered users and manage their administrative roles.</p>
+
+                <table class="table table-hover bg-white shadow-sm">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="sortable" onclick="sortUsers('id')">User ID</th>
+                            <th class="sortable" onclick="sortUsers('name')">Name</th>
+                            <th class="sortable" onclick="sortUsers('email')">Email</th>
+                            <th class="sortable" onclick="sortUsers('role')">Role</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
                         </tbody>
                 </table>
             </div>
@@ -163,7 +191,7 @@
 </div>
 
 <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg"> 
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Order Details: #<span id="modalOrderId"></span></h5>
@@ -204,7 +232,7 @@
                         </tr>
                     </thead>
                     <tbody id="modalOrderItems">
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
             <div class="modal-footer">

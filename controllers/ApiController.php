@@ -164,5 +164,37 @@ class ApiController {
         echo json_encode($logs);
         exit();
     }
+    //USERS
+    /**
+     * URL: index.php?controller=Api&action=users
+     */
+    public function users() {
+        $users = UserDAO::getAllUsers();
+        header('Content-Type: application/json');
+        echo json_encode($users);
+        exit();
+    }
+
+    /**
+     * URL: index.php?controller=Api&action=update_user_role
+     */
+    public function update_user_role() {
+        $input = json_decode(file_get_contents('php://input'), true);
+        if (!isset($input['id']) || !isset($input['role'])) {
+            echo json_encode(['success' => false]);
+            exit();
+        }
+
+        $success = UserDAO::updateRole($input['id'], $input['role']);
+        
+        if($success) {
+            $adminId = $_SESSION['user_id'] ?? 1;
+            LogDAO::logAction($adminId, 'Updated User Role', "User ID: {$input['id']} changed to {$input['role']}");
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success]);
+        exit();
+    }
 }
 ?>
