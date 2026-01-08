@@ -72,7 +72,9 @@
                                     <tr>
                                         <td><strong>#<?= $order['order_id'] ?></strong></td>
                                         <td><?= date('d M Y', strtotime($order['order_date'])) ?></td>
-                                        <td class="fw-bold">$<?= number_format($order['total_price'], 2) ?></td>
+                                        <td class="fw-bold product-price" data-usd="<?= $order['total_price'] ?>">
+                                            $<?= number_format($order['total_price'], 2) ?>
+                                        </td>
                                     </tr>
                                 <?php endforeach; ?>
                             </tbody>

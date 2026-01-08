@@ -1609,3 +1609,56 @@ footer {
     background-color: #f8f9fa;
     padding-left: 1.25rem;
 }
+
+/* Currency Selector Styling */
+.currency-selector .btn-currency {
+    font-size: 0.85rem;
+    font-weight: bold;
+    border: none;
+    background: transparent;
+    padding: 0.25rem 0.5rem;
+}
+
+.currency-selector .dropdown-item {
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+/* Hover state with the requested color #C21818 */
+.currency-selector .dropdown-item:hover {
+    background-color: #C21818;
+    color: #ffffff;
+}
+
+/* Dashboard link styling in Navbar */
+.nav-dashboard-link {
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #000000;
+}
+/* Navbar Specific Styles */
+.nav-dashboard-link {
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #212529; /* text-dark */
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+}
+
+.currency-btn {
+    font-size: 0.85rem;
+}
+
+/* Red Hover Effect for Currency Dropdown */
+.currency-selector .dropdown-item:hover {
+    background-color: #C21818 !important;
+    color: white !important;
+}
+
+.cart-badge {
+    font-size: 0.6rem;
+}

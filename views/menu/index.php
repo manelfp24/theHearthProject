@@ -119,7 +119,9 @@ foreach ($active_sections as $index => $type):
 
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <h3 class="product-name mb-0 lh-1"><?= $item->getName() ?></h3>
-                            <span class="fw-bold fs-5 text-nowrap ms-2 lh-1">$<?= number_format($item->getBasePrice(), 2) ?></span>
+                            <span class="fw-bold fs-5 text-nowrap ms-2 lh-1 product-price" data-usd="<?= $item->getBasePrice() ?>">
+                                $<?= number_format($item->getBasePrice(), 2) ?>
+                            </span>
                         </div>
 
                         <div class="d-flex align-items-center justify-content-between mt-3">

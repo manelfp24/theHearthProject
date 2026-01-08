@@ -67,7 +67,7 @@
                                         </small>
                                     </td>
 
-                                    <td class="text-center fw-bold">
+                                    <td class="text-center fw-bold product-price" data-usd="<?= $price ?>">
                                         $<?= number_format($price, 2) ?>
                                     </td>
 
@@ -81,7 +81,7 @@
                                         </div>
                                     </td>
 
-                                    <td class="text-center fw-bold text-danger">
+                                    <td class="text-center fw-bold text-danger product-price" data-usd="<?= $total ?>">
                                         $<?= number_format($total, 2) ?>
                                     </td>
 
@@ -122,16 +122,20 @@
                     </div>
 
                     <div class="text-end">
-                        <span class="cart-total-label d-block text-muted">Subtotal: $<?= number_format($cartTotal, 2) ?></span>
+                        <span class="cart-total-label d-block text-muted">
+                            Subtotal: <span class="product-price" data-usd="<?= $cartTotal ?>">$<?= number_format($cartTotal, 2) ?></span>
+                        </span>
 
                         <?php if (isset($_SESSION['applied_coupon'])): ?>
                             <span class="d-block text-success small">
-                                Discount: -$<?= number_format($discountAmount, 2) ?>
+                                Discount: -<span class="product-price" data-usd="<?= $discountAmount ?>">$<?= number_format($discountAmount, 2) ?></span>
                             </span>
                         <?php endif; ?>
 
-                        <span class="cart-total-amount d-block fs-3 fw-bold" id="displayTotal">
-                            $<?= number_format(isset($finalTotal) ? $finalTotal : $cartTotal, 2) ?>
+                        <span class="cart-total-amount d-block fs-3 fw-bold">
+                             <span id="displayTotal" class="product-price" data-usd="<?= isset($finalTotal) ? $finalTotal : $cartTotal ?>">
+                                $<?= number_format(isset($finalTotal) ? $finalTotal : $cartTotal, 2) ?>
+                             </span>
                         </span>
                     </div>
 
