@@ -42,5 +42,34 @@ class UserDAO {
         $con->close();
         return $success;
     }
+
+    public static function getUserById($id) {
+        $con = Database::connect();
+        $stmt = $con->prepare("SELECT * FROM user WHERE user_id = ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        
+        $result = $stmt->get_result();
+        $user = $result->fetch_object(); // Returns object (use $user->name)
+        
+        $stmt->close();
+        $con->close();
+        
+        return $user;
+    }
+
+    public static function updateUser($id, $name, $email) {
+        $con = Database::connect();
+        
+        $stmt = $con->prepare("UPDATE user SET name = ?, email = ? WHERE user_id = ?");
+        $stmt->bind_param("ssi", $name, $email, $id);
+        
+        $success = $stmt->execute();
+        
+        $stmt->close();
+        $con->close();
+        
+        return $success;
+    }
 }
 ?>

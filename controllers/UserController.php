@@ -95,5 +95,47 @@ class UserController {
         header("Location: index.php");
         exit();
     }
+
+    public function profile() {
+        // 1. Security Check: Redirect to login if not logged in
+        if (!isset($_SESSION['user_id'])) {
+            header("Location: index.php?controller=User&action=login");
+            exit();
+        }
+
+        $userId = $_SESSION['user_id'];
+
+        // 2. Get User Details (We need to add this function to UserDAO next)
+        $user = UserDAO::getUserById($userId);
+
+        //3. FETCH THE LAST 3 ORDERS
+        $recentOrders = OrderDAO::getLastOrdersByUser($userId, 3);
+        
+        // 4. Load the View
+        require_once __DIR__ . '/../views/user/profile.php'; 
+    }
+
+    /**
+     * URL: index.php?controller=User&action=update_profile
+     */
+    public function update_profile() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SESSION['user_id'])) {
+            $userId = $_SESSION['user_id'];
+            $newName = $_POST['name'];
+            $newEmail = $_POST['email'];
+
+            // Save to DB
+            $success = UserDAO::updateUser($userId, $newName, $newEmail);
+
+            if ($success) {
+                // Update the session name if you use it in the navbar
+                $_SESSION['user_name'] = $newName; 
+                header("Location: index.php?controller=User&action=profile&success=1");
+            } else {
+                header("Location: index.php?controller=User&action=profile&error=1");
+            }
+            exit();
+        }
+    }
 }
 ?>
