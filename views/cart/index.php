@@ -1,10 +1,12 @@
 <div class="container py-5 cart-container">
 
+    <?php // cabecera de la página del carrito ?>
     <div class="text-center mb-5">
         <h1 class="section-main-title">Your Selection</h1>
         <p class="section-description mx-auto">Review your chosen dishes before sending them to the kitchen.</p>
     </div>
 
+    <?php // mostramos la opción de repetir último pedido si el usuario ya ha comprado antes ?>
     <?php if (isset($hasPreviousOrder) && $hasPreviousOrder): ?>
         <div class="alert alert-light border d-flex justify-content-between align-items-center mb-4 shadow-sm">
             <div>
@@ -19,6 +21,7 @@
         </div>
     <?php endif; ?>
 
+    <?php // si el carrito está vacío mostramos mensaje, si no, la tabla ?>
     <?php if (empty($cartItems)): ?>
 
         <div class="text-center py-5">
@@ -45,7 +48,8 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($cartItems as $item):
+                            <?php 
+                            foreach ($cartItems as $item):
                                 $p = $item['product'];
                                 $qty = (int)$item['quantity'];
                                 $price = (float)$p->getBasePrice();
@@ -59,12 +63,8 @@
                                     </td>
 
                                     <td>
-                                        <h5 class="cart-product-title">
-                                            <?= $p->getName() ?>
-                                        </h5>
-                                        <small class="cart-product-desc">
-                                            <?= $p->getDescription() ?>
-                                        </small>
+                                        <h5 class="cart-product-title"><?= $p->getName() ?></h5>
+                                        <small class="cart-product-desc"><?= $p->getDescription() ?></small>
                                     </td>
 
                                     <td class="text-center fw-bold product-price" data-usd="<?= $price ?>">
@@ -75,7 +75,7 @@
                                         <div class="d-flex justify-content-center">
                                             <div class="quantity-pill">
                                                 <button class="qty-btn" onclick="updateCartItem(<?= $p->getProductId() ?>, -1)">-</button>
-                                                <span class="qty-display" id="cart-qty-<?= $p->getProductId() ?>"><?= $qty ?></span>
+                                                <span class="qty-display"><?= $qty ?></span>
                                                 <button class="qty-btn" onclick="updateCartItem(<?= $p->getProductId() ?>, 1)">+</button>
                                             </div>
                                         </div>
@@ -86,8 +86,7 @@
                                     </td>
 
                                     <td class="text-end">
-                                        <button class="btn btn-sm btn-link text-danger text-decoration-none"
-                                            onclick="removeFromCart(<?= $p->getProductId() ?>)">
+                                        <button class="btn btn-sm btn-link text-danger text-decoration-none" onclick="removeFromCart(<?= $p->getProductId() ?>)">
                                             REMOVE
                                         </button>
                                     </td>
@@ -99,17 +98,17 @@
             </div>
         </div>
 
+        <?php // sección de cupones y totales finales ?>
         <div class="row justify-content-center mt-5 mb-5">
             <div class="col-lg-10">
                 <div class="d-flex flex-column flex-md-row justify-content-end align-items-center gap-4">
 
+                    <?php // gestión de cupones ?>
                     <div class="coupon-section">
                         <?php if (isset($_SESSION['applied_coupon'])): ?>
                             <div class="d-flex align-items-center gap-2 text-success">
                                 <i class="bi bi-tag-fill"></i>
-                                <span class="fw-bold">
-                                    Code <?= htmlspecialchars($_SESSION['applied_coupon']['code']) ?> applied!
-                                </span>
+                                <span class="fw-bold">Code <?= htmlspecialchars($_SESSION['applied_coupon']['code']) ?> applied!</span>
                                 <a href="index.php?controller=Cart&action=removeCoupon" class="text-danger small text-decoration-underline ms-2">Remove</a>
                             </div>
                         <?php else: ?>
@@ -121,6 +120,7 @@
                         <?php endif; ?>
                     </div>
 
+                    <?php // desglose de precios finales ?>
                     <div class="text-end">
                         <span class="cart-total-label d-block text-muted">
                             Subtotal: <span class="product-price" data-usd="<?= $cartTotal ?>">$<?= number_format($cartTotal, 2) ?></span>
@@ -139,6 +139,7 @@
                         </span>
                     </div>
 
+                    <?php // botón para proceder al checkout ?>
                     <a href="index.php?controller=Cart&action=checkout" class="btn-hearth-add btn-checkout-custom text-decoration-none px-5 py-3">
                         Proceed to Checkout
                     </a>

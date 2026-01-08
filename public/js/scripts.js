@@ -1,23 +1,26 @@
-/* File: public/js/scripts.js */
+/* file: public/js/scripts.js */
 
-/* Updated Scroll Function */
+// función para controlar el desplazamiento lateral de las listas de productos
 function scrollCuts(direction, trackId) {
-    // If no ID is provided, default to the main one (backwards compatibility)
+    // si no se indica un id, usamos por defecto 'cutstrack' para mantener compatibilidad
     const id = trackId || 'cutsTrack';
     const track = document.getElementById(id);
     
     if (!track) return; 
 
+    // definimos cuántos píxeles se moverá la lista en cada clic
     const scrollAmount = 350;
 
     if (direction === 'left') {
+        // movemos el scroll hacia la izquierda
         track.scrollLeft -= scrollAmount;
     } else {
+        // movemos el scroll hacia la derecha
         track.scrollLeft += scrollAmount;
     }
 }
 
-/* --- FECHA DE VOLVER ARRIBA  --- */
+// lógica para el botón de volver arriba que aparece al hacer scroll
 document.addEventListener('DOMContentLoaded', function() {
     
     const scrollBtn = document.getElementById('scrollTopBtn');
@@ -26,24 +29,22 @@ document.addEventListener('DOMContentLoaded', function() {
     if (scrollBtn) {
         
         window.addEventListener('scroll', function() {
-            // Get current scroll position
+            // obtenemos la posición actual del scroll en la ventana
             let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
             
-            // Logic:
-            // 1. Is the user scrolling UP? (currentScroll < lastScrollTop)
-            // 2. Are they past the very top area? (currentScroll > 200) - prevents it showing instantly at the banner
+            // el botón aparece si el usuario sube y ya ha bajado más de 200 píxeles
             if (currentScroll < lastScrollTop && currentScroll > 200) {
                 scrollBtn.classList.add('show');
             } else {
-                // User is scrolling DOWN or is at the very top -> Hide button
+                // ocultamos el botón si baja o si está muy cerca del inicio
                 scrollBtn.classList.remove('show');
             }
             
-            // Update last scroll position for the next check
+            // guardamos la posición para compararla en el siguiente movimiento
             lastScrollTop = currentScroll <= 0 ? 0 : currentScroll; 
         });
 
-        // Click event remains the same
+        // al hacer clic, subimos suavemente hasta el inicio de la página
         scrollBtn.addEventListener('click', function() {
             window.scrollTo({
                 top: 0,
@@ -53,21 +54,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-/**
- * GENERAL SCRIPTS
- * Handles Tooltips, Quantity inputs, and Cart interactions.
- */
-
+// scripts generales para inicializar componentes y gestionar el carrito
 document.addEventListener("DOMContentLoaded", function() {
-    // 1. Initialize Bootstrap Tooltips (For the "i" icon)
+    // activamos los tooltips de bootstrap para los iconos de información
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 });
 
-// 2. Quantity Logic (+ and -)
-// We attach it to window so the HTML onclick="" can find it
+// lógica para los botones de más y menos en el selector de cantidad
 window.updateQty = function(id, change) {
     const display = document.getElementById('qty-' + id);
     if (!display) return;
@@ -75,30 +71,31 @@ window.updateQty = function(id, change) {
     let currentQty = parseInt(display.innerText);
     let newQty = currentQty + change;
     
-    if (newQty < 0) newQty = 0; // Prevent negatives
+    // evitamos que la cantidad pueda ser menor que cero
+    if (newQty < 0) newQty = 0; 
     
     display.innerText = newQty;
 };
 
-// 3. Add to Cart Logic (AJAX)
+// envía el producto seleccionado al servidor para añadirlo a la sesión del carrito
 window.addToCart = function(id) {
     const display = document.getElementById('qty-' + id);
     if (!display) return;
     
     const quantity = parseInt(display.innerText);
 
+    // avisamos si el usuario intenta añadir cero unidades
     if (quantity === 0) {
         alert("Please select at least 1 unit.");
         return;
     }
 
-    // Prepare data
     const payload = {
         id: id,
         quantity: quantity
     };
 
-    // Send to PHP Controller
+    // usamos fetch para mandar los datos al controlador de php sin recargar
     fetch('index.php?controller=Cart&action=add', {
         method: 'POST',
         headers: {
@@ -109,21 +106,16 @@ window.addToCart = function(id) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // --- THE "AUTO-UPDATE" MAGIC ---
-            // This line updates the Red Badge instantly without reload
+            // actualizamos el número del contador rojo en el menú al instante
             const badge = document.getElementById('cart-count');
             if (badge) {
                 badge.innerText = data.newCount;
-                
-                // Optional: Add a small "bump" animation to the badge
+                // añadimos una pequeña animación para avisar visualmente del cambio
                 badge.classList.add('animate__animated', 'animate__pulse');
             }
 
-            // Reset the quantity pill to 0
+            // reseteamos el contador de la ficha a cero tras añadirlo
             display.innerText = "0";
-
-            // Visual Confirmation
-            // You can replace this alert with a Toast notification later
             console.log("Cart updated:", data.newCount);
         } else {
             alert("Error: " + data.message);
@@ -132,13 +124,9 @@ window.addToCart = function(id) {
     .catch(error => console.error('Error:', error));
 };
 
-/* --- CART PAGE LOGIC --- */
-
-// 1. Update Quantity (+1 or -1)
-// This function forces a page reload to update the Grand Total
+// lógica específica para la página de gestión del carrito
+// actualiza la cantidad de un objeto ya existente y recarga para ver los totales
 window.updateCartItem = function(id, change) {
-    console.log("Updating item:", id, "Change:", change); // Debugging line
-
     fetch('index.php?controller=Cart&action=update_quantity', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -147,7 +135,8 @@ window.updateCartItem = function(id, change) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            location.reload(); // Reload to see new prices
+            // recargamos para que php vuelva a calcular todos los precios y descuentos
+            location.reload(); 
         } else {
             alert("Error updating cart: " + (data.message || "Unknown error"));
         }
@@ -155,7 +144,7 @@ window.updateCartItem = function(id, change) {
     .catch(error => console.error('Error:', error));
 };
 
-// 2. Remove Entire Item
+// elimina un producto completo del carrito tras confirmar con el usuario
 window.removeFromCart = function(id) {
     if(!confirm("Are you sure you want to remove this item?")) return;
 
@@ -175,29 +164,25 @@ window.removeFromCart = function(id) {
     .catch(error => console.error('Error:', error));
 };
 
-/**
- * Checks if user is logged in.
- * If NOT: shows confirmation popup and redirects to login.
- * If YES: returns true (allows action to proceed).
- */
+// función de seguridad para verificar si el usuario está logueado antes de actuar
 function checkAuthAndRedirect() {
-    // 1. Check the variable defined in PHP
+    // comprobamos la variable global que definimos con php en el navbar
     if (typeof window.isUserLoggedIn !== 'undefined' && window.isUserLoggedIn === true) {
-        return true; // User is logged in, allow the click!
+        return true; // el usuario está dentro, permitimos la acción
     }
 
-    // 2. User is NOT logged in. Show the browser popup.
+    // si no hay sesión, mostramos un aviso y ofrecemos ir al login
     const wantsToLogin = confirm("You must be logged in to order. Would you like to log in now?");
 
     if (wantsToLogin) {
-        // Redirect to your login controller action
         window.location.href = 'index.php?controller=User&action=login';
     }
 
-    // 3. Return false to cancel the original click (don't open cart/menu)
+    // devolvemos falso para anular el clic original del enlace
     return false;
 }
-//USAR CUPONES DESCUENTO
+
+// procesa la aplicación de un cupón de descuento en el carrito
 function applyCoupon() {
     const codeInput = document.getElementById('couponCode');
     const messageBox = document.getElementById('couponMessage');
@@ -215,14 +200,13 @@ function applyCoupon() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            // Reload page to show the "Applied" state and updated calculations securely
+            // recargamos para que se apliquen los nuevos cálculos de forma segura en el servidor
             window.location.reload(); 
         } else {
-            // Show error message
+            // si el cupón falla, mostramos el error y lo borramos a los 3 segundos
             messageBox.textContent = data.message;
             messageBox.style.display = 'block';
             
-            // Clear message after 3 seconds
             setTimeout(() => {
                 messageBox.textContent = '';
             }, 3000);
@@ -233,4 +217,3 @@ function applyCoupon() {
         messageBox.textContent = "System error. Try again.";
     });
 }
-

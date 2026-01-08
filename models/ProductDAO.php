@@ -1,43 +1,42 @@
 <?php
-// Cargamos header y navbar
+// cargamos la configuración de la base de datos y la clase producto
 include_once __DIR__ . '/../config/Database.php';
 include_once __DIR__ . '/Product.php';
 
 class ProductDAO {
     
-    //cogemos los productos de la base de datos
+    // obtiene todos los productos disponibles de la base de datos
     public static function getAllProducts() {
-        // Conectamos a la bbdd
+        // conectamos a la base de datos
         $con = Database::connect();
         
-        // preparamos la consulta sql
-        // filtramos por available y nombre
+        // preparamos la consulta para traer solo los productos disponibles ordenados por nombre
         $stmt = $con->prepare("SELECT * FROM product WHERE available = 1 ORDER BY name ASC");
         
-        // ejecutamos
+        // ejecutamos la petición
         $stmt->execute();
         $result = $stmt->get_result();
         
-        //guardamos los resultados en un array
+        // creamos una lista para guardar los objetos producto
         $productList = [];
         
-        // con 'fetch_object' creamos instancias de la clase producto y 
-        //llenamos sus propiedades (product_id, name, etc.)
+        // usamos fetch_object para que cada fila se convierta automáticamente en un objeto de la clase product
         while ($product = $result->fetch_object('Product')) {
             $productList[] = $product;
         }
         
+        // cerramos la conexión para ahorrar recursos
         $con->close();
         return $productList;
     }
     
-    //hacemos fetch de los productos del carrousel (is_featured)
+    // recupera los productos destacados para mostrarlos en el carrusel según su categoría
     public static function getFeaturedProducts($category) {
         $con = Database::connect();
         
-        // usamos'?' placeholders para la segurirdad
+        // usamos el signo '?' para evitar inyecciones sql y mejorar la seguridad
         $stmt = $con->prepare("SELECT * FROM product WHERE product_type = ? AND is_featured = 1");
-        $stmt->bind_param("s", $category); // "s" significa string
+        $stmt->bind_param("s", $category); 
         
         $stmt->execute();
         $result = $stmt->get_result();
@@ -51,10 +50,7 @@ class ProductDAO {
         return $featuredList;
     }
 
-    /**
-     * Deletes a product by ID.
-     * Returns TRUE if successful, FALSE if it fails (e.g. foreign key constraint).
-     */
+    // elimina un producto de la base de datos usando su identificador único
     public static function delete($id) {
         $con = Database::connect();
         
@@ -62,37 +58,36 @@ class ProductDAO {
         $stmt->bind_param("i", $id);
         
         try {
+            // intentamos borrar el registro
             $result = $stmt->execute();
             $con->close();
             return $result;
         } catch (mysqli_sql_exception $e) {
-            // If it fails (e.g. product is in an active order), return false
+            // si el producto está en algún pedido activo, la base de datos dará error y devolvemos falso
             $con->close();
             return false;
         }
     }
-    /**
-     * Inserts a new product (Now includes Description).
-     */
+
+    // inserta un producto nuevo en la carta incluyendo su descripción
     public static function insert($name, $description, $category, $price, $image) {
         $con = Database::connect();
-        // Added 'description' column and placeholder '?'
+        // preparamos la sentencia con los campos necesarios
         $stmt = $con->prepare("INSERT INTO product (name, description, product_type, base_price, image, available) VALUES (?, ?, ?, ?, ?, 1)");
         $stmt->bind_param("sssds", $name, $description, $category, $price, $image);
         
         $result = $stmt->execute();
+        // obtenemos el id que la base de datos le ha asignado al nuevo producto
         $id = $con->insert_id; 
         $con->close();
         
         return $id;
     }
 
-    /**
-     * Updates an existing product (Now includes Description).
-     */
+    // actualiza la información de un producto que ya existe en el sistema
     public static function update($id, $name, $description, $category, $price, $image) {
         $con = Database::connect();
-        // Added 'description=?' to the SET clause
+        // modificamos los valores basándonos en el id del producto
         $stmt = $con->prepare("UPDATE product SET name=?, description=?, product_type=?, base_price=?, image=? WHERE product_id=?");
         $stmt->bind_param("sssdsi", $name, $description, $category, $price, $image, $id);
         
@@ -102,10 +97,7 @@ class ProductDAO {
         return $result;
     }
 
-    /**
-     * Fetch a single product by ID.
-     * Uses Setters to ensure data is loaded correctly.
-     */
+    // busca y devuelve los datos de un solo producto a través de su id
     public static function getProductById($id) {
         $con = Database::connect();
         $stmt = $con->prepare("SELECT * FROM product WHERE product_id = ?");
@@ -115,15 +107,15 @@ class ProductDAO {
         
         $product = null;
         if ($row = $result->fetch_assoc()) {
-            // 1. Create empty object
+            // creamos el objeto producto vacío
             $product = new Product();
             
-            // 2. Manually fill it using Setters
+            // llenamos el objeto manualmente usando los setters de la clase
             $product->setProductId($row['product_id']);
             $product->setName($row['name']);
             $product->setDescription($row['description']);
             $product->setProductType($row['product_type']);
-            $product->setBasePrice((float)$row['base_price']); // Force float type
+            $product->setBasePrice((float)$row['base_price']); 
             $product->setImage($row['image']);
             $product->setAvailable($row['available']);
         }

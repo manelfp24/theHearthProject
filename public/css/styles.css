@@ -5,12 +5,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
 :root {
-    /* YOUR PALETTE */
-    --hearth-red: #CB171A;    /* Buttons & Accents */
-    --hearth-beige: #EFEBE6;  /* Page Background */
-    --hearth-grey: #757575;   /* Secondary Text */
-    --hearth-black: #000000;  /* Navbar & Footer */
-    --hearth-white: #FFFFFF;  /* Text on dark backgrounds */
+    /* paleta de colores */
+    --hearth-red: #CB171A;    
+    --hearth-beige: #EFEBE6;  
+    --hearth-grey: #757575;   
+    --hearth-black: #000000;  
+    --hearth-white: #FFFFFF;  
 }
 
 body {
@@ -18,18 +18,14 @@ body {
     background-color: var(--hearth-white);
     color: var(--hearth-black);
     
-    /* THIS IS THE MARGIN YOU ASKED FOR */
-    /* It adds space on left and right, framing the whole content */
+    
+    
     padding: 0 var(--page-margin); 
     
-    /* Ensure content doesn't touch top/bottom edges strictly if you don't want it to */
+    
     margin: 0;
-    overflow-x: hidden; /* Prevents horizontal scrollbars */
+    overflow-x: hidden;
 }
-
-/* =========================================
-   2. NAVIGATION BAR
-   ========================================= */
 /* --- NAVIGATION BAR --- */
 
 /* Navbar Container */
@@ -39,123 +35,101 @@ body {
     padding-bottom: 1.5rem;
     margin-left: 2rem;
     margin-right: 2rem;
-    /* Ensure relative positioning for the centered logo to work */
     position: relative; 
 }
 
 
 /* --- CENTER LOGO SPECIFICS --- */
 .center-logo {
-    /* Absolute positioning creates perfect centering */
     position: absolute;
     left: 50%;
     transform: translateX(-50%);
-    
-    /* Your specific red color */
     color: #CB171A !important;
-    
     font-family: 'Libre Baskerville', serif;
-    font-weight: 700; /* Bold */
+    font-weight: 700; 
     font-size: 1.75rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     text-decoration: none !important;
 }
 
-/* STRICT RULE: No hover effect for the center logo */
+
 .center-logo:hover {
-    color: #CB171A !important; /* Remains the same red */
+    color: #CB171A !important; /* no cambia de color */
 }
 
 .navbar {
   display: flex;
-  align-items: center; /* Vertically centers the logo */
+  align-items: center; 
   padding: 1rem;
   background-color: var(--hearth-white);
 }
 
 .logo {
-  height: 40px; /* Adjust this to match your navbar height */
-  width: auto;  /* Keeps the aspect ratio correct */
+  height: 40px; 
+  width: auto;  
 }
 
-
-/* --- LEFT & RIGHT INTERACTIVE ELEMENTS --- */
-
-/* 1. Left "EXPERIENCE" Trigger */
+/*  "EXPERIENCE"  */
 .nav-left-trigger {
-    color: #000000; /* Black by default */
+    color: #000000; 
     font-weight: 600;
     letter-spacing: 1px;
     transition: color 0.3s ease;
 }
 
-/* 2. Right Side Icon Links */
+/* Icon Links */
 .nav-icon-link {
-    color: #000000; /* Black by default */
+    color: #000000; 
     text-decoration: none;
     transition: color 0.3s ease;
     display: flex;
     align-items: center;
 }
 
-/* HOVER STATE for both left and right elements */
+/* HOVER STATE */
 .nav-left-trigger:hover,
 .nav-icon-link:hover {
-    color: #CB171A; /* Change to your Red on hover */
+    color: #CB171A; 
 }
 
-/* Utility to hide default bootstrap dropdown arrow */
+/* que no se vea la flechita de bootsrap que viene por defecto */
 .dropdown-toggle.hide-arrow::after {
     display: none !important;
 }
 
-/* =========================================
-   3. HERO BANNER
-   ========================================= */
-/* --- Banner Layout --- */
+/* --- Banner  --- */
 .hero-banner {
     position: relative;
     min-height: 85vh;
     background-size: cover;
     background-position: center;
     color: white;
-
-    /* FLEXBOX: Aligns content to bottom left */
     display: flex;
     align-items: flex-end; 
     justify-content: flex-start; 
     padding-bottom: 100px; 
-
-    /* --- NEW CHANGES HERE --- */
-    margin: 0 3.5rem; /* Adds 2rem space on Left and Right */
-    overflow: hidden; /* Ensures the image stays inside the rounded corners */
+    margin: 0 3.5rem; 
+    overflow: hidden; 
 }
 
-/* --- Dark Overlay --- */
 .overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    /* Gradient: darker at bottom to make white text pop */
     background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7));
     z-index: 1;
 }
 
-/* --- Typography & Content --- */
 .banner-content {
-    /* Crucial for lifting text above the overlay */
     position: relative; 
     z-index: 2; 
-
-    /* Alignment & Layout */
     width: 100%;
     max-width: 1200px; 
     margin: 0 auto; 
-    padding-left: 20px; 
-    
+    padding-left: 20px;     
     font-family: 'Libre Baskerville', serif;
     text-align: left;
 }
@@ -164,84 +138,69 @@ body {
     font-size: 1.1rem;
     letter-spacing: 2px;
     text-transform: uppercase;
-    font-weight: 700; /* Bold for the small "DISCOVER" text */
+    font-weight: 700; 
     display: block;
     margin-bottom: 15px;
-    color: #e0e0e0; /* Slightly off-white for elegance */
+    color: #e0e0e0; 
 }
 
 .banner-content h1 {
     font-size: clamp(2.5rem, 5vw, 3rem);
     line-height: 1.1;
     margin-bottom: 30px;
-    font-weight: 700; /* Bold for the main headline */
+    font-weight: 700; 
 }
 
-/* --- BUTTON STYLES (Red Sweep Effect) --- */
+/* --- Boton ( Sweep rojo) --- */
 
 .cta-button {
-    /* Layout Essentials for <a> tags */
     display: inline-block;
     text-decoration: none;
     text-align: center;
-    
-    /* Spacing */
-    margin-top: 15px; /* Adds space above the button */
+    margin-top: 15px; 
     padding: 12px 35px;
-    
-    /* Font & Appearance */
-    font-family: 'Libre Baskerville', serif; /* Matches your theme */
-    font-size: 0.9em; /* Adjusted slightly for balance */
+    font-family: 'Libre Baskerville', serif; 
+    font-size: 0.9em; 
     font-weight: 700;
     text-transform: uppercase;
     cursor: pointer;
-    
-    /* Colors (Default State) */
-    background: #CB171A; /* Red Background */
-    color: #FFFFFF;      /* White Text */
-    border: 2px solid #CB171A; /* Red Border */
-    
-    /* Shape */
-    border-radius: 30px 10px 30px 30px; /* The unique shape you requested */
-    
-    /* Animation Essentials */
+    background: #CB171A;
+    color: #FFFFFF;      
+    border: 2px solid #CB171A;
+    border-radius: 30px 10px 30px 30px;
     position: relative; 
-    overflow: hidden; /* Crucial: keeps the sweep effect inside the button */
+    overflow: hidden; 
     z-index: 1;
     transition: color 0.4s ease-in-out, border-color 0.4s ease-in-out; 
 }
 
-/* --- The "Sweep" Effect (::before) --- */
+/* --- sweep (::before) --- */
 .cta-button::before {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    
-    /* Make it huge to cover the whole button during rotation */
+
     width: 450%; 
     height: 450%; 
-    
-    /* The Sweep Color: WHITE */
+
     background: #FFFFFF; 
-    z-index: -1; /* Sits behind the text */
+    z-index: -1; 
     
-    /* Start position: Hidden to the right */
     transform: translate(-50%, -50%) rotate(45deg) translateX(100%);
     
-    /* Animation speed */
+    /* animacion */
     transition: transform 0.5s ease-in-out;
 }
 
 /* --- Hover State --- */
 .cta-button:hover::before {
-    /* Move the white sweep into view */
     transform: translate(-50%, -50%) rotate(45deg) translateX(0); 
 }
 
 .cta-button:hover {
-    color: #CB171A; /* Text turns RED to contrast with white background */
-    border-color: #CB171A; /* Border remains red */
+    color: #CB171A; 
+    border-color: #CB171A; 
 }
 
 /* --- Active/Click State --- */
@@ -1390,105 +1349,104 @@ footer {
     left: 50%;
     width: 500%; /* Huge to cover the rotation */
     height: 500%; 
-    background: #000000; /* Sweep to Black */
+    background: #000000; 
     z-index: -1; 
-    transform: translate(-50%, -50%) rotate(45deg) translateX(100%); /* Start hidden */
+    transform: translate(-50%, -50%) rotate(45deg) translateX(100%); 
     transition: transform 0.4s cubic-bezier(0.3, 1, 0.8, 1);
 }
 
 /* Hover State */
 .btn-sweep-black:hover {
-    color: #FFFFFF; /* Text turns White */
+    color: #FFFFFF; 
 }
 
 .btn-sweep-black:hover::before {
-    transform: translate(-50%, -50%) rotate(45deg) translateX(0); /* Sweep in */
+    transform: translate(-50%, -50%) rotate(45deg) translateX(0); 
 }
 
-/* "Repeat Order" Button Styles */
+/* "Repeat Order" */
 .btn-hearth-repeat {
     position: relative;
     display: inline-block;
-    color: #CB171A;              /* Red text */
-    border: 2px solid #CB171A;   /* Red border */
+    color: #CB171A;             
+    border: 2px solid #CB171A;   
     background-color: transparent;
-    overflow: hidden;            /* Essential for the sweep effect */
+    overflow: hidden;            
     transition: color 0.4s ease-in-out;
     z-index: 1;
-    text-decoration: none;       /* Remove underline */
-    border-radius: 5px;          /* Match your other buttons */
+    text-decoration: none;       
+    border-radius: 5px;          
 }
 
-/* The sweeping background layer */
+/*  sweeping  */
 .btn-hearth-repeat::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;                 /* Start off-screen to the left */
+    left: -100%;                 
     width: 100%;
     height: 100%;
-    background-color: #CB171A;   /* Red background fill */
+    background-color: #CB171A;   
     transition: left 0.4s ease-in-out;
-    z-index: -1;                 /* Put it behind the text */
+    z-index: -1;                 
 }
 
-/* Hover State */
+
 .btn-hearth-repeat:hover {
-    color: #ffffff;              /* Text turns white */
+    color: #ffffff;              
 }
 
 .btn-hearth-repeat:hover::before {
-    left: 0;                     /* Sweep in from left to right */
+    left: 0;                     
 }
 
-/* Icon Color Adjustment */
+
 .icon-red {
     color: #CB171A;
 }
 
-/* "Repeat Order" Button Styles */
+/* Repeat Order */
 .btn-hearth-repeat {
     position: relative;
     display: inline-block;
-    color: #CB171A;              /* Red text */
-    border: 2px solid #CB171A;   /* Red border */
+    color: #CB171A;              
+    border: 2px solid #CB171A;   
     background-color: transparent;
-    overflow: hidden;            /* Essential for the sweep effect */
+    overflow: hidden;            
     transition: color 0.4s ease-in-out;
     z-index: 1;
-    text-decoration: none;       /* Remove underline */
-    border-radius: 5px;          /* Match your other buttons */
+    text-decoration: none;       
+    border-radius: 5px;          
 }
 
-/* The sweeping background layer */
+/* sweep */
 .btn-hearth-repeat::before {
     content: '';
     position: absolute;
     top: 0;
-    left: -100%;                 /* Start off-screen to the left */
+    left: -100%;                 
     width: 100%;
     height: 100%;
-    background-color: #CB171A;   /* Red background fill */
+    background-color: #CB171A;   
     transition: left 0.4s ease-in-out;
-    z-index: -1;                 /* Put it behind the text */
+    z-index: -1;                
 }
 
-/* Hover State */
+/* Hover  */
 .btn-hearth-repeat:hover {
-    color: #ffffff;              /* Text turns white */
+    color: #ffffff;              
 }
 
 .btn-hearth-repeat:hover::before {
-    left: 0;                     /* Sweep in from left to right */
+    left: 0;                     
 }
 
-/* Icon Color Adjustment */
+
 .icon-red {
     color: #CB171A;
 }
-/* --- REPEAT ORDER BUTTON --- */
+/* --- REPEAT ORDER  --- */
 .btn-hearth-repeat {
-    /* Layout & Text */
     display: inline-block;
     font-weight: 700;
     text-transform: uppercase;
@@ -1496,16 +1454,16 @@ footer {
     cursor: pointer;
     font-size: 0.875rem; 
     
-    /* Shape */
+    /* forma */
     padding: 6px 1.5rem;
     border-radius: 50px 25px 50px 50px !important; 
     
-    /* Colors */
+    /* colores */
     background: transparent; 
     color: #FFFFFF;          
     border: 2px solid #CB171A !important;
     
-    /* Animation Essentials */
+    /* animacion */
     position: relative; 
     overflow: hidden; 
     z-index: 1; 
@@ -1513,7 +1471,7 @@ footer {
     text-decoration: none;
 }
 
-/* LAYER 1: The Permanent Red Background (Bottom) */
+
 .btn-hearth-repeat::after {
     content: '';
     position: absolute;
@@ -1523,40 +1481,39 @@ footer {
     border-radius: inherit; 
 }
 
-/* LAYER 2: The White Sweep (Middle) */
+/* sweep blanco */
 .btn-hearth-repeat::before {
     content: '';
     position: absolute;
     top: 50%;
     left: 50%;
-    /* Increased size to 350% to ensure corners are fully covered */
     width: 1200%; 
     height: 1200%; 
     background: #FFFFFF; 
     z-index: -1; 
     
-    /* LOGIC: 
-       1. Center the box (-50%, -50%)
-       2. Rotate -45deg (Y-axis now points to Bottom-Right)
-       3. TranslateY(100%) pushes it OUT to the Bottom-Right corner
+    /* LOGICa: 
+       1. centramos caja (-50%, -50%)
+       2. Rotatamos -45deg (eje Y)
+       3. TranslateY(100%) lo saca fuera para que no s evea
     */
     transform: translate(-50%, -50%) rotate(-45deg) translateY(100%);
     
-    /* Animation speed */
+    /* animacion */
     transition: transform 0.6s cubic-bezier(0.3, 1, 0.8, 1); 
 }
 
-/* --- Hover State --- */
+/* --- Hover--- */
 .btn-hearth-repeat:hover {
     color: #CB171A; /* Text turns RED */
 }
 
 .btn-hearth-repeat:hover::before {
-    /* Slide the white sweep IN to the center (filling the button) */
+    /* sweep blanco */
     transform: translate(-50%, -50%) rotate(-45deg) translateY(0); 
 }
 
-/* Active State */
+/* activo */
 .btn-hearth-repeat:active {
     filter: brightness(0.85); 
     transition: filter 0.1s ease-out; 
@@ -1566,7 +1523,7 @@ footer {
     color: #CB171A;
 }
 
-/* Custom Red Outline Button (for forms/inputs) */
+/* botón inputs */
 .btn-outline-red {
     color: var(--hearth-black) !important;
     border: 1px solid #000000 !important;
@@ -1580,12 +1537,12 @@ footer {
     border: 1px solid #C21818;
 }
 
-/* Profile Page Styles */
+/* PAGINA DE PERFIL */
 .profile-avatar {
     width: 80px;
     height: 80px;
     font-size: 2rem;
-    background-color: #212529; /* bg-dark */
+    background-color: #000000;
     color: #ffffff;
     border-radius: 50%;
     display: inline-flex;
@@ -1610,7 +1567,7 @@ footer {
     padding-left: 1.25rem;
 }
 
-/* Currency Selector Styling */
+/* Selector divisa */
 .currency-selector .btn-currency {
     font-size: 0.85rem;
     font-weight: bold;
@@ -1624,7 +1581,7 @@ footer {
     transition: all 0.2s ease;
 }
 
-/* Hover state with the requested color #C21818 */
+
 .currency-selector .dropdown-item:hover {
     background-color: #C21818;
     color: #ffffff;
@@ -1639,12 +1596,11 @@ footer {
     font-weight: bold;
     color: #000000;
 }
-/* Navbar Specific Styles */
 .nav-dashboard-link {
     text-decoration: none;
     text-transform: uppercase;
     font-weight: bold;
-    color: #212529; /* text-dark */
+    color: #000000; 
     font-size: 0.85rem;
     letter-spacing: 1px;
 }
@@ -1661,4 +1617,23 @@ footer {
 
 .cart-badge {
     font-size: 0.6rem;
+}
+
+/* estilos para las cabeceras de tabla ordenables del panel de administración */
+.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    transition: background-color 0.2s ease;
+}
+
+.sortable:hover {
+    background-color: #000000; 
+    color: #FFFFFF;
+}
+
+.sortable::after {
+    content: ' ↕';
+    font-size: 0.8em;
+    opacity: 0.5;
 }

@@ -1,11 +1,7 @@
 <?php
 
-/**
- * VIEW: Menu Index
- * Updated to include Cart & Info Tooltips
- */
-
-// 1. CONFIGURATION ARRAYS
+// 1. arrays de configuración
+// definimos los nombres que se mostrarán para cada categoría del menú
 $display_titles = [
     'Meats'     => 'MEATS',
     'Seafood'   => 'SEAFOOD',
@@ -16,6 +12,7 @@ $display_titles = [
     'Desserts'  => 'DESSERTS'
 ];
 
+// rutas de las imágenes que representan cada sección en la navegación visual
 $category_images = [
     'Meats'     => 'img/meats-section-logo.png',
     'Seafood'   => 'img/seafood-section-logo.png',
@@ -26,6 +23,7 @@ $category_images = [
     'Desserts'  => 'img/desserts-section-logo.png'
 ];
 
+// breves textos descriptivos para ambientar cada categoría del restaurante
 $section_descriptions = [
     'Meats'     => 'Our commitment to the mastery of meat and flame, expertly sourced and prepared.',
     'Seafood'   => 'Fresh from the ocean, featuring sustainable catches and pristine shellfish.',
@@ -36,7 +34,8 @@ $section_descriptions = [
     'Desserts'  => 'Decadent finales to complete your dining experience.'
 ];
 
-// 2. ORGANIZE DATA
+// 2. organización de los datos
+// agrupamos los productos por su tipo para facilitar el renderizado por secciones
 $menu_items = [];
 if (isset($allProducts)) {
     foreach ($allProducts as $product) {
@@ -58,6 +57,7 @@ if (isset($allProducts)) {
             <?php foreach ($display_titles as $db_type => $title):
                 if (isset($category_images[$db_type])):
                     $img_path = '/DAW2/thehearth/public/' . $category_images[$db_type];
+                    // ajuste de estilo específico para que el icono de seafood se vea equilibrado
                     $custom_style = ($db_type === 'Seafood') ? 'padding: 15px;' : '';
             ?>
                     <a href="#section-<?= $db_type ?>" class="cat-nav-item text-decoration-none text-center">
@@ -73,6 +73,7 @@ if (isset($allProducts)) {
 </section>
 
 <?php
+// filtramos para mostrar solo las secciones que realmente contienen productos
 $active_sections = [];
 foreach ($display_titles as $type => $title) {
     if (!empty($menu_items[$type])) {
@@ -80,6 +81,7 @@ foreach ($display_titles as $type => $title) {
     }
 }
 
+// bucle principal que genera cada bloque de categoría del menú
 foreach ($active_sections as $index => $type):
     $title = $display_titles[$type];
     $items = $menu_items[$type];

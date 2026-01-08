@@ -1,20 +1,24 @@
 // ---------------------------------------------------------
-// 1. NAVIGATION LOGIC
+// 1. lógica de navegación
 // ---------------------------------------------------------
 
+// seleccionamos todos los botones del menú y las secciones de contenido
 const botonesMenu = document.querySelectorAll(".menu-btn");
 const secciones = document.querySelectorAll(".content-section");
 
 botonesMenu.forEach((boton) => {
     boton.addEventListener("click", () => {
+        // quitamos la clase activa de todos los botones y se la damos al pulsado
         botonesMenu.forEach(b => b.classList.remove('active'));
         boton.classList.add('active');
 
+        // obtenemos el id de la sección que queremos mostrar
         const targetId = boton.getAttribute("data-target");
         setActiveSection(targetId);
     });
 });
 
+// función para ocultar todas las secciones y mostrar solo la seleccionada
 function setActiveSection(targetId) {
     secciones.forEach((seccion) => {
         seccion.classList.add("d-none");
@@ -26,9 +30,10 @@ function setActiveSection(targetId) {
 }
 
 // ---------------------------------------------------------
-// 2. PRODUCT CLASS
+// 2. clase producto
 // ---------------------------------------------------------
 
+// definimos la estructura de los objetos de tipo producto en javascript
 class Product {
     constructor(id, name, description, category, price, available, image) {
         this.id = id;
@@ -40,6 +45,7 @@ class Product {
         this.image = image; 
     }
 
+    // genera el código html de la fila para la tabla de productos
     getHtmlRow() {
         const statusBadge = this.available == 1 
             ? '<span class="badge bg-success">Active</span>' 
@@ -62,17 +68,20 @@ class Product {
 }
 
 // ---------------------------------------------------------
-// 3. PRODUCT FETCH AND DATA MANAGEMENT
+// 3. carga de productos y gestión de datos
 // ---------------------------------------------------------
 
+// array global para guardar la lista de productos
 const arrayProducts = []; 
 
+// pedimos los productos a la api de php al cargar la página
 fetch('index.php?controller=Api&action=products')
     .then(response => response.json())
     .then(data => {
         data.forEach(item => {
             const imgPath = item.image || item.img || 'img/logo.svg'; 
             
+            // creamos una nueva instancia de la clase product por cada elemento
             const nuevoProducto = new Product(
                 item.id, 
                 item.name,
@@ -85,11 +94,12 @@ fetch('index.php?controller=Api&action=products')
             
             arrayProducts.push(nuevoProducto);
         });
+        // dibujamos la tabla con los datos obtenidos
         renderTable(arrayProducts);
     })
     .catch(error => console.error("Error loading products:", error));
 
-
+// función para limpiar la tabla y volver a pintarla con la lista actualizada
 function renderTable(productsList) {
     const tableBody = document.getElementById('productsTableBody');
     if (!tableBody) return;
@@ -100,14 +110,16 @@ function renderTable(productsList) {
 }
 
 // ---------------------------------------------------------
-// 4. PRODUCT FILTER / SEARCH
+// 4. filtro y búsqueda de productos
 // ---------------------------------------------------------
 
 const searchInput = document.getElementById('searchInput');
 
 if(searchInput) {
+    // evento que salta cada vez que el usuario escribe en el buscador
     searchInput.addEventListener('input', (e) => {
         const text = e.target.value.toLowerCase();
+        // filtramos el array original buscando coincidencias en el nombre
         const filteredProducts = arrayProducts.filter(product => {
             return product.name.toLowerCase().includes(text);
         });
@@ -116,12 +128,14 @@ if(searchInput) {
 }
 
 // ---------------------------------------------------------
-// 5. PRODUCT DELETE FUNCTIONALITY
+// 5. funcionalidad para borrar productos
 // ---------------------------------------------------------
 
 function deleteProduct(id) {
+    // pedimos confirmación antes de borrar nada
     if (!confirm("Are you sure you want to delete this product?")) return;
 
+    // enviamos la petición de borrado a la api
     fetch('index.php?controller=Api&action=delete_product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -130,12 +144,15 @@ function deleteProduct(id) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // si el borrado en la base de datos funciona, quitamos la fila de la pantalla
             const row = document.getElementById(`row-${id}`);
             if (row) row.remove(); 
             
+            // actualizamos el array local eliminando el producto
             const index = arrayProducts.findIndex(p => p.id === id);
             if (index > -1) arrayProducts.splice(index, 1);
             
+            // refrescamos el historial de acciones (logs)
             fetchLogs(); 
         } else {
             alert("Error: " + data.message);
@@ -145,9 +162,10 @@ function deleteProduct(id) {
 }
 
 // ---------------------------------------------------------
-// 6. PRODUCT MODAL LOGIC (Create & Edit)
+// 6. lógica de modales para productos (crear y editar)
 // ---------------------------------------------------------
 
+// limpia los campos del formulario para crear un producto desde cero
 function openCreateModal() {
     document.getElementById('modalTitle').innerText = "New Product";
     document.getElementById('prodId').value = ""; 
@@ -161,6 +179,7 @@ function openCreateModal() {
     modal.show();
 }
 
+// rellena el formulario con los datos del producto seleccionado para editarlo
 function openEditModal(id) {
     const product = arrayProducts.find(p => p.id == id);
     if (!product) return;
@@ -177,6 +196,7 @@ function openEditModal(id) {
     modal.show();
 }
 
+// envía los datos del formulario al servidor para guardar los cambios
 function saveProduct() {
     const id = document.getElementById('prodId').value;
     const name = document.getElementById('prodName').value;
@@ -185,6 +205,7 @@ function saveProduct() {
     const price = document.getElementById('prodPrice').value;
     const image = document.getElementById('prodImage').value; 
 
+    // validación básica de campos obligatorios
     if(!name || !price) {
         alert("Please fill in all required fields.");
         return;
@@ -200,15 +221,18 @@ function saveProduct() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // cerramos el modal de bootstrap tras el éxito
             const modalEl = document.getElementById('productModal');
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
 
             if (id) {
+                // si estábamos editando, actualizamos el objeto en el array local
                 const product = arrayProducts.find(p => p.id == id);
                 Object.assign(product, { name, description, category, price: parseFloat(price), image });
                 renderTable(arrayProducts);
             } else {
+                // si es nuevo, creamos el objeto y lo añadimos a la lista
                 const newProd = new Product(data.id, name, description, category, price, 1, image);
                 arrayProducts.push(newProd);
                 renderTable(arrayProducts);
@@ -224,12 +248,13 @@ function saveProduct() {
 
 
 // =========================================================
-// 7. ORDERS LOGIC
+// 7. lógica de pedidos
 // =========================================================
 
 let arrayOrders = []; 
 let currentOrderId = null; 
 
+// cargamos todos los pedidos del sistema desde la api
 fetch('index.php?controller=Api&action=orders')
     .then(response => response.json())
     .then(data => {
@@ -238,7 +263,7 @@ fetch('index.php?controller=Api&action=orders')
     })
     .catch(error => console.error("Error loading orders:", error));
 
-
+// dibuja la tabla de pedidos aplicando colores según el estado
 function renderOrdersTable(ordersList) {
     const tableBody = document.getElementById('ordersTableBody');
     if (!tableBody) return;
@@ -246,6 +271,7 @@ function renderOrdersTable(ordersList) {
 
     ordersList.forEach(order => {
         let badgeClass = 'bg-secondary';
+        // asignamos el color de la etiqueta según si está enviado, entregado o pendiente
         if(order.status === 'delivered') badgeClass = 'bg-success';
         if(order.status === 'shipped') badgeClass = 'bg-info text-dark';
         if(order.status === 'cancelled') badgeClass = 'bg-danger';
@@ -269,6 +295,7 @@ function renderOrdersTable(ordersList) {
     });
 }
 
+// funciones para filtrar la tabla de pedidos por id o estado
 const searchOrderInput = document.getElementById('searchOrderInput');
 const filterStatus = document.getElementById('filterStatus');
 
@@ -288,7 +315,7 @@ if(filterStatus) filterStatus.addEventListener('change', filterOrders);
 
 
 // =========================================================
-// 8. ORDERS MODAL LOGIC
+// 8. lógica del modal de detalles de pedido
 // =========================================================
 
 function openOrderModal(id) {
@@ -296,12 +323,14 @@ function openOrderModal(id) {
     if(!order) return;
     currentOrderId = id; 
 
+    // rellenamos la información general del pedido en el modal
     document.getElementById('modalOrderId').innerText = order.id;
     document.getElementById('modalOrderDate').innerText = order.date;
     document.getElementById('modalOrderUser').innerText = order.user_id;
     document.getElementById('modalOrderTotal').innerText = parseFloat(order.total).toFixed(2);
     document.getElementById('modalOrderStatus').value = order.status;
 
+    // limpiamos y pintamos la lista de productos que contiene el pedido
     const itemsTbody = document.getElementById('modalOrderItems');
     itemsTbody.innerHTML = "";
     order.items.forEach(item => {
@@ -319,6 +348,7 @@ function openOrderModal(id) {
     modal.show();
 }
 
+// actualiza el estado de un pedido enviando el cambio al servidor
 function updateOrderStatus() {
     const newStatus = document.getElementById('modalOrderStatus').value;
     fetch('index.php?controller=Api&action=update_order_status', {
@@ -329,6 +359,7 @@ function updateOrderStatus() {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
+            // actualizamos el estado en el array local y refrescamos la tabla
             const order = arrayOrders.find(o => o.id == currentOrderId);
             order.status = newStatus;
             renderOrdersTable(arrayOrders);
@@ -343,11 +374,12 @@ function updateOrderStatus() {
 
 
 // =========================================================
-// 9. SYSTEM LOGS
+// 9. historial del sistema (logs)
 // =========================================================
 
 let arrayLogs = []; 
 
+// obtiene la lista de acciones realizadas por los administradores
 function fetchLogs() {
     fetch('index.php?controller=Api&action=logs')
         .then(response => response.json())
@@ -360,6 +392,7 @@ function fetchLogs() {
 
 fetchLogs();
 
+// pinta la tabla de historial usando colores según el tipo de acción
 function renderLogsTable(logsList) {
     const tableBody = document.getElementById('logsTableBody');
     if (!tableBody) return; 
@@ -367,6 +400,7 @@ function renderLogsTable(logsList) {
 
     logsList.forEach(log => {
         let colorClass = 'text-dark';
+        // rojo para borrados, verde para creaciones y azul para actualizaciones
         if (log.action.includes('Delete')) colorClass = 'text-danger';
         if (log.action.includes('Create')) colorClass = 'text-success';
         if (log.action.includes('Update')) colorClass = 'text-primary';
@@ -383,19 +417,21 @@ function renderLogsTable(logsList) {
 }
 
 // =========================================================
-// 10. TABLE SORTING LOGIC
+// 10. lógica para ordenar las tablas
 // =========================================================
 
+// guardamos el estado de ordenación de cada tabla (clave y dirección)
 let sortState = {
     products: { key: 'id', dir: 1 },
     orders: { key: 'id', dir: 1 },
     logs: { key: 'timestamp', dir: -1 },
-    users: { key: 'user_id', dir: 1 } // Added users
+    users: { key: 'user_id', dir: 1 }
 };
 
+// función genérica para ordenar cualquier lista basándose en una propiedad
 function genericSort(list, key, state) {
     if (state.key === key) {
-        state.dir *= -1; 
+        state.dir *= -1; // si pulsamos la misma columna, invertimos el orden
     } else {
         state.key = key;
         state.dir = 1;
@@ -405,9 +441,11 @@ function genericSort(list, key, state) {
         let valA = a[key];
         let valB = b[key];
 
+        // tratamos los textos en minúsculas para comparar bien
         if (typeof valA === 'string') valA = valA.toLowerCase();
         if (typeof valB === 'string') valB = valB.toLowerCase();
 
+        // si los valores son números, los convertimos para compararlos correctamente
         if (!isNaN(parseFloat(valA)) && isFinite(valA)) valA = parseFloat(valA);
         if (!isNaN(parseFloat(valB)) && isFinite(valB)) valB = parseFloat(valB);
 
@@ -417,6 +455,7 @@ function genericSort(list, key, state) {
     });
 }
 
+// funciones específicas que disparan la ordenación en cada tabla
 function sortProducts(key) {
     genericSort(arrayProducts, key, sortState.products);
     renderTable(arrayProducts);
@@ -439,11 +478,12 @@ function sortUsers(key) {
 }
 
 // =========================================================
-// 11. USER MANAGEMENT LOGIC (NEW SECTION)
+// 11. gestión de usuarios
 // =========================================================
 
 let arrayUsers = [];
 
+// cargamos la lista de usuarios registrados
 fetch('index.php?controller=Api&action=users')
     .then(response => response.json())
     .then(data => {
@@ -452,6 +492,7 @@ fetch('index.php?controller=Api&action=users')
     })
     .catch(error => console.error("Error loading users:", error));
 
+// genera las filas de la tabla de usuarios incluyendo el selector de rol
 function renderUsersTable(usersList) {
     const tableBody = document.getElementById('usersTableBody');
     if(!tableBody) return;
@@ -477,6 +518,7 @@ function renderUsersTable(usersList) {
     });
 }
 
+// cambia el rango de un usuario (admin/cliente) tras la confirmación del servidor
 function updateUserRole(id) {
     const newRole = document.getElementById(`role-${id}`).value;
     fetch('index.php?controller=Api&action=update_user_role', {
@@ -487,6 +529,7 @@ function updateUserRole(id) {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
+            // actualizamos el rol en los datos locales
             const user = arrayUsers.find(u => u.user_id == id);
             user.role = newRole;
             alert("Role updated successfully!");
