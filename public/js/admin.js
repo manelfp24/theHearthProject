@@ -26,11 +26,10 @@ function setActiveSection(targetId) {
 }
 
 // ---------------------------------------------------------
-// 2. PRODUCT CLASS (UPDATED WITH IMAGE)
+// 2. PRODUCT CLASS
 // ---------------------------------------------------------
 
 class Product {
-    // 1. ADD 'image' to the constructor arguments
     constructor(id, name, description, category, price, available, image) {
         this.id = id;
         this.name = name;
@@ -38,7 +37,7 @@ class Product {
         this.category = category;
         this.price = parseFloat(price);
         this.available = available;
-        this.image = image; // 2. Store the image
+        this.image = image; 
     }
 
     getHtmlRow() {
@@ -63,7 +62,7 @@ class Product {
 }
 
 // ---------------------------------------------------------
-// 3. FETCH AND DATA MANAGEMENT
+// 3. PRODUCT FETCH AND DATA MANAGEMENT
 // ---------------------------------------------------------
 
 const arrayProducts = []; 
@@ -72,8 +71,6 @@ fetch('index.php?controller=Api&action=products')
     .then(response => response.json())
     .then(data => {
         data.forEach(item => {
-            // 3. PASS 'item.image' when creating the object
-            // Make sure your JSON API returns 'image' or 'img' key correctly
             const imgPath = item.image || item.img || 'img/logo.svg'; 
             
             const nuevoProducto = new Product(
@@ -83,7 +80,7 @@ fetch('index.php?controller=Api&action=products')
                 item.category, 
                 item.price, 
                 item.available,
-                imgPath // <--- PASS IMAGE HERE
+                imgPath 
             );
             
             arrayProducts.push(nuevoProducto);
@@ -102,7 +99,7 @@ function renderTable(productsList) {
 }
 
 // ---------------------------------------------------------
-// 4. FILTER / SEARCH
+// 4. PRODUCT FILTER / SEARCH
 // ---------------------------------------------------------
 
 const searchInput = document.getElementById('searchInput');
@@ -116,7 +113,7 @@ searchInput.addEventListener('input', (e) => {
 });
 
 // ---------------------------------------------------------
-// 5. DELETE FUNCTIONALITY
+// 5. PRODUCT DELETE FUNCTIONALITY
 // ---------------------------------------------------------
 
 function deleteProduct(id) {
@@ -144,20 +141,16 @@ function deleteProduct(id) {
 }
 
 // ---------------------------------------------------------
-// 6. MODAL LOGIC (Create & Edit)
+// 6. PRODUCT MODAL LOGIC (Create & Edit)
 // ---------------------------------------------------------
 
 function openCreateModal() {
     document.getElementById('modalTitle').innerText = "New Product";
-    
-    // Clear Fields
     document.getElementById('prodId').value = ""; 
     document.getElementById('prodName').value = "";
     document.getElementById('prodDesc').value = "";
     document.getElementById('prodPrice').value = "";
     document.getElementById('prodCategory').value = "Meats";
-    
-    // 4. RESET IMAGE TO DEFAULT FOR NEW PRODUCTS
     document.getElementById('prodImage').value = "img/logo.svg";
 
     const modal = new bootstrap.Modal(document.getElementById('productModal'));
@@ -169,15 +162,11 @@ function openEditModal(id) {
     if (!product) return;
 
     document.getElementById('modalTitle').innerText = "Edit Product";
-    
-    // Fill the form
     document.getElementById('prodId').value = product.id;
     document.getElementById('prodName').value = product.name;
     document.getElementById('prodDesc').value = product.description || "";
     document.getElementById('prodPrice').value = product.price;
     document.getElementById('prodCategory').value = product.category;
-
-    // 5. THIS IS THE FIX: Load the specific image for this product
     document.getElementById('prodImage').value = product.image; 
 
     const modal = new bootstrap.Modal(document.getElementById('productModal'));
@@ -190,7 +179,7 @@ function saveProduct() {
     const description = document.getElementById('prodDesc').value;
     const category = document.getElementById('prodCategory').value;
     const price = document.getElementById('prodPrice').value;
-    const image = document.getElementById('prodImage').value; // Get the image
+    const image = document.getElementById('prodImage').value; 
 
     if(!name || !price) {
         alert("Please fill in all required fields.");
@@ -203,7 +192,7 @@ function saveProduct() {
         description: description,
         category: category,
         price: price,
-        image: image // Send image to API
+        image: image 
     };
 
     fetch('index.php?controller=Api&action=save_product', {
@@ -219,27 +208,175 @@ function saveProduct() {
             modal.hide();
 
             if (id) {
-                // UPDATE LOCAL ARRAY
+                // UPDATE LOCAL
                 const product = arrayProducts.find(p => p.id == id);
                 product.name = name;
                 product.description = description;
                 product.category = category;
                 product.price = parseFloat(price);
-                product.image = image; // 6. Update local image so next edit is correct
-                
+                product.image = image; 
                 renderTable(arrayProducts);
             } else {
                 // ADD NEW LOCAL
-                // Careful: Ensure 'data.id' is returned by your API
                 const newProd = new Product(data.id, name, description, category, price, 1, image);
                 arrayProducts.push(newProd);
                 renderTable(arrayProducts);
             }
-            
             alert(data.message);
         } else {
             alert("Error saving product.");
         }
     })
     .catch(error => console.error('Error:', error));
+}
+
+
+// =========================================================
+// 7. ORDERS LOGIC (NEW SECTION)
+// =========================================================
+
+let arrayOrders = []; // Store fetched orders here
+let currentOrderId = null; // To know which order we are editing in the modal
+
+// A. Fetch Orders from API
+fetch('index.php?controller=Api&action=orders')
+    .then(response => response.json())
+    .then(data => {
+        arrayOrders = data; // Save to memory
+        renderOrdersTable(arrayOrders); // Draw table
+    })
+    .catch(error => console.error("Error loading orders:", error));
+
+
+// B. Render Orders Table
+function renderOrdersTable(ordersList) {
+    const tableBody = document.getElementById('ordersTableBody');
+    tableBody.innerHTML = ""; 
+
+    ordersList.forEach(order => {
+        // Status Badge Color Logic
+        let badgeClass = 'bg-secondary';
+        if(order.status === 'delivered') badgeClass = 'bg-success';
+        if(order.status === 'shipped') badgeClass = 'bg-info text-dark';
+        if(order.status === 'cancelled') badgeClass = 'bg-danger';
+        if(order.status === 'pending') badgeClass = 'bg-warning text-dark';
+
+        // Create Row HTML
+        const row = `
+            <tr>
+                <td>#${order.id}</td>
+                <td>${order.date}</td>
+                <td>User #${order.user_id}</td>
+                <td class="fw-bold">$${parseFloat(order.total).toFixed(2)}</td>
+                <td><span class="badge ${badgeClass}">${order.status.toUpperCase()}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-primary" onclick="openOrderModal(${order.id})">
+                        View Details
+                    </button>
+                </td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+}
+
+
+// C. Filter Logic (Search & Status)
+const searchOrderInput = document.getElementById('searchOrderInput');
+const filterStatus = document.getElementById('filterStatus');
+
+// Helper function to apply both filters
+function filterOrders() {
+    const searchText = searchOrderInput.value.toLowerCase();
+    const statusValue = filterStatus.value;
+
+    const filtered = arrayOrders.filter(order => {
+        // Check ID match (converts id to string)
+        const matchesId = order.id.toString().includes(searchText);
+        
+        // Check Status match
+        const matchesStatus = (statusValue === 'all') || (order.status === statusValue);
+
+        return matchesId && matchesStatus;
+    });
+
+    renderOrdersTable(filtered);
+}
+
+// Attach events
+if(searchOrderInput) searchOrderInput.addEventListener('input', filterOrders);
+if(filterStatus) filterStatus.addEventListener('change', filterOrders);
+
+
+// =========================================================
+// 8. ORDERS MODAL LOGIC
+// =========================================================
+
+// A. Open Modal & Fill Data
+function openOrderModal(id) {
+    const order = arrayOrders.find(o => o.id == id);
+    if(!order) return;
+
+    currentOrderId = id; // Store for update function
+
+    // Fill Header Info
+    document.getElementById('modalOrderId').innerText = order.id;
+    document.getElementById('modalOrderDate').innerText = order.date;
+    document.getElementById('modalOrderUser').innerText = order.user_id;
+    document.getElementById('modalOrderTotal').innerText = parseFloat(order.total).toFixed(2);
+    
+    // Set Status Dropdown
+    document.getElementById('modalOrderStatus').value = order.status;
+
+    // Fill Items Table
+    const itemsTbody = document.getElementById('modalOrderItems');
+    itemsTbody.innerHTML = "";
+
+    order.items.forEach(item => {
+        const itemRow = `
+            <tr>
+                <td>${item.product_name}</td>
+                <td>$${parseFloat(item.price).toFixed(2)}</td>
+                <td>x${item.quantity}</td>
+                <td class="fw-bold">$${parseFloat(item.subtotal).toFixed(2)}</td>
+            </tr>
+        `;
+        itemsTbody.innerHTML += itemRow;
+    });
+
+    // Show Modal
+    const modal = new bootstrap.Modal(document.getElementById('orderModal'));
+    modal.show();
+}
+
+// B. Update Status
+function updateOrderStatus() {
+    const newStatus = document.getElementById('modalOrderStatus').value;
+
+    fetch('index.php?controller=Api&action=update_order_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: currentOrderId, status: newStatus })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            // Update local array
+            const order = arrayOrders.find(o => o.id == currentOrderId);
+            order.status = newStatus;
+            
+            // Re-render table to show new color/status
+            renderOrdersTable(arrayOrders);
+            
+            // Close Modal
+            const modalEl = document.getElementById('orderModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+            
+            alert("Order updated successfully!");
+        } else {
+            alert("Error updating order.");
+        }
+    })
+    .catch(error => console.error("Error:", error));
 }

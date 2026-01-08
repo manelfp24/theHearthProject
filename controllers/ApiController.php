@@ -1,6 +1,7 @@
 <?php
 // Cargamos DAO
 require_once __DIR__ . '/../models/ProductDAO.php';
+require_once __DIR__ . '/../models/OrderDAO.php';
 
 class ApiController {
 
@@ -27,8 +28,6 @@ class ApiController {
                 'price' => $p->getBasePrice(),
                 'category' => $p->getProductType(),
                 'available' => $p->getAvailable(),
-                
-                // --- FIX IS HERE: ADD THIS LINE ---
                 'image' => $p->getImage() 
             ];
         }
@@ -87,6 +86,44 @@ class ApiController {
             'id' => $id,
             'message' => $message
         ]);
+        exit();
+    }
+
+    // ---------------------------------------------------
+    // NEW ADDITIONS FOR ORDERS DASHBOARD
+    // ---------------------------------------------------
+
+    /**
+     * URL: index.php?controller=Api&action=orders
+     * Returns all orders with their items
+     */
+    public function orders() {
+        // We call the OrderDAO to get all orders (grouped by ID)
+        $orders = OrderDAO::getAllOrdersWithItems();
+        
+        header('Content-Type: application/json');
+        echo json_encode($orders);
+        exit();
+    }
+
+    /**
+     * URL: index.php?controller=Api&action=update_order_status
+     * Method: POST
+     * Payload: { "id": 123, "status": "shipped" }
+     */
+    public function update_order_status() {
+        $input = json_decode(file_get_contents('php://input'), true);
+
+        if (!isset($input['id']) || !isset($input['status'])) {
+            echo json_encode(['success' => false, 'message' => 'Missing ID or Status']);
+            exit();
+        }
+
+        // Update the status in the DB
+        $success = OrderDAO::updateStatus($input['id'], $input['status']);
+
+        header('Content-Type: application/json');
+        echo json_encode(['success' => $success]);
         exit();
     }
 }
