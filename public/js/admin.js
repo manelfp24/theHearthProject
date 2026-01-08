@@ -133,6 +133,9 @@ function deleteProduct(id) {
             const index = arrayProducts.findIndex(p => p.id === id);
             if (index > -1) arrayProducts.splice(index, 1);
             
+            // Reload logs to show the delete action
+            fetchLogs(); 
+
         } else {
             alert("Error: " + data.message);
         }
@@ -223,6 +226,7 @@ function saveProduct() {
                 renderTable(arrayProducts);
             }
             alert(data.message);
+            fetchLogs(); // Refresh logs to show this action
         } else {
             alert("Error saving product.");
         }
@@ -232,36 +236,33 @@ function saveProduct() {
 
 
 // =========================================================
-// 7. ORDERS LOGIC (NEW SECTION)
+// 7. ORDERS LOGIC
 // =========================================================
 
-let arrayOrders = []; // Store fetched orders here
-let currentOrderId = null; // To know which order we are editing in the modal
+let arrayOrders = []; 
+let currentOrderId = null; 
 
-// A. Fetch Orders from API
+// Fetch Orders
 fetch('index.php?controller=Api&action=orders')
     .then(response => response.json())
     .then(data => {
-        arrayOrders = data; // Save to memory
-        renderOrdersTable(arrayOrders); // Draw table
+        arrayOrders = data; 
+        renderOrdersTable(arrayOrders); 
     })
     .catch(error => console.error("Error loading orders:", error));
 
 
-// B. Render Orders Table
 function renderOrdersTable(ordersList) {
     const tableBody = document.getElementById('ordersTableBody');
     tableBody.innerHTML = ""; 
 
     ordersList.forEach(order => {
-        // Status Badge Color Logic
         let badgeClass = 'bg-secondary';
         if(order.status === 'delivered') badgeClass = 'bg-success';
         if(order.status === 'shipped') badgeClass = 'bg-info text-dark';
         if(order.status === 'cancelled') badgeClass = 'bg-danger';
         if(order.status === 'pending') badgeClass = 'bg-warning text-dark';
 
-        // Create Row HTML
         const row = `
             <tr>
                 <td>#${order.id}</td>
@@ -281,29 +282,23 @@ function renderOrdersTable(ordersList) {
 }
 
 
-// C. Filter Logic (Search & Status)
+// Filter Logic (Search & Status)
 const searchOrderInput = document.getElementById('searchOrderInput');
 const filterStatus = document.getElementById('filterStatus');
 
-// Helper function to apply both filters
 function filterOrders() {
     const searchText = searchOrderInput.value.toLowerCase();
     const statusValue = filterStatus.value;
 
     const filtered = arrayOrders.filter(order => {
-        // Check ID match (converts id to string)
         const matchesId = order.id.toString().includes(searchText);
-        
-        // Check Status match
         const matchesStatus = (statusValue === 'all') || (order.status === statusValue);
-
         return matchesId && matchesStatus;
     });
 
     renderOrdersTable(filtered);
 }
 
-// Attach events
 if(searchOrderInput) searchOrderInput.addEventListener('input', filterOrders);
 if(filterStatus) filterStatus.addEventListener('change', filterOrders);
 
@@ -312,23 +307,18 @@ if(filterStatus) filterStatus.addEventListener('change', filterOrders);
 // 8. ORDERS MODAL LOGIC
 // =========================================================
 
-// A. Open Modal & Fill Data
 function openOrderModal(id) {
     const order = arrayOrders.find(o => o.id == id);
     if(!order) return;
 
-    currentOrderId = id; // Store for update function
+    currentOrderId = id; 
 
-    // Fill Header Info
     document.getElementById('modalOrderId').innerText = order.id;
     document.getElementById('modalOrderDate').innerText = order.date;
     document.getElementById('modalOrderUser').innerText = order.user_id;
     document.getElementById('modalOrderTotal').innerText = parseFloat(order.total).toFixed(2);
-    
-    // Set Status Dropdown
     document.getElementById('modalOrderStatus').value = order.status;
 
-    // Fill Items Table
     const itemsTbody = document.getElementById('modalOrderItems');
     itemsTbody.innerHTML = "";
 
@@ -344,12 +334,10 @@ function openOrderModal(id) {
         itemsTbody.innerHTML += itemRow;
     });
 
-    // Show Modal
     const modal = new bootstrap.Modal(document.getElementById('orderModal'));
     modal.show();
 }
 
-// B. Update Status
 function updateOrderStatus() {
     const newStatus = document.getElementById('modalOrderStatus').value;
 
@@ -361,22 +349,124 @@ function updateOrderStatus() {
     .then(response => response.json())
     .then(data => {
         if(data.success) {
-            // Update local array
             const order = arrayOrders.find(o => o.id == currentOrderId);
             order.status = newStatus;
-            
-            // Re-render table to show new color/status
             renderOrdersTable(arrayOrders);
             
-            // Close Modal
             const modalEl = document.getElementById('orderModal');
             const modal = bootstrap.Modal.getInstance(modalEl);
             modal.hide();
             
             alert("Order updated successfully!");
+            fetchLogs(); // Refresh logs to show this action
         } else {
             alert("Error updating order.");
         }
     })
     .catch(error => console.error("Error:", error));
+}
+
+
+// =========================================================
+// 9. SYSTEM LOGS
+// =========================================================
+
+let arrayLogs = []; // Global variable to store logs for sorting
+
+// A. Fetch Logs Function
+function fetchLogs() {
+    fetch('index.php?controller=Api&action=logs')
+        .then(response => response.json())
+        .then(data => {
+            arrayLogs = data; // Store data globally
+            renderLogsTable(arrayLogs);
+        })
+        .catch(error => console.error("Error loading logs:", error));
+}
+
+// Call it immediately so table fills up on load
+fetchLogs();
+
+// B. Render Logs Table
+function renderLogsTable(logsList) {
+    const tableBody = document.getElementById('logsTableBody');
+    if (!tableBody) return; 
+    
+    tableBody.innerHTML = ""; 
+
+    logsList.forEach(log => {
+        let colorClass = 'text-dark';
+        if (log.action.includes('Delete')) colorClass = 'text-danger';
+        if (log.action.includes('Create')) colorClass = 'text-success';
+        if (log.action.includes('Update')) colorClass = 'text-primary';
+
+        const row = `
+            <tr>
+                <td class="text-muted small">${log.timestamp}</td>
+                <td>${log.admin_name || 'System/Unknown'}</td>
+                <td class="fw-bold ${colorClass}">${log.action}</td>
+                <td>${log.affected_entity}</td>
+            </tr>
+        `;
+        tableBody.innerHTML += row;
+    });
+}
+
+// =========================================================
+// 10. TABLE SORTING LOGIC (NEW SECTION)
+// =========================================================
+
+// State to track sorting direction (1 = ASC, -1 = DESC)
+let sortState = {
+    products: { key: 'id', dir: 1 },
+    orders: { key: 'id', dir: 1 },
+    logs: { key: 'timestamp', dir: -1 }
+};
+
+/**
+ * Generic Helper Function to Sort Arrays
+ */
+function genericSort(list, key, state) {
+    // If clicking the same column, flip direction. Else, reset to ASC (1)
+    if (state.key === key) {
+        state.dir *= -1; 
+    } else {
+        state.key = key;
+        state.dir = 1;
+    }
+
+    list.sort((a, b) => {
+        let valA = a[key];
+        let valB = b[key];
+
+        // Convert strings to lowercase for case-insensitive sorting
+        if (typeof valA === 'string') valA = valA.toLowerCase();
+        if (typeof valB === 'string') valB = valB.toLowerCase();
+
+        // Handle numeric values (prices, IDs)
+        // Check if string is actually a number
+        if (!isNaN(parseFloat(valA)) && isFinite(valA)) valA = parseFloat(valA);
+        if (!isNaN(parseFloat(valB)) && isFinite(valB)) valB = parseFloat(valB);
+
+        if (valA < valB) return -1 * state.dir;
+        if (valA > valB) return 1 * state.dir;
+        return 0;
+    });
+}
+
+// --- SPECIFIC WRAPPERS ---
+
+function sortProducts(key) {
+    genericSort(arrayProducts, key, sortState.products);
+    renderTable(arrayProducts);
+}
+
+function sortOrders(key) {
+    genericSort(arrayOrders, key, sortState.orders);
+    renderOrdersTable(arrayOrders);
+}
+
+function sortLogs(key) {
+    genericSort(arrayLogs, key, sortState.logs);
+    renderLogsTable(arrayLogs);
 }
