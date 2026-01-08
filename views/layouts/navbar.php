@@ -50,10 +50,20 @@
     <div class="d-flex align-items-center gap-4 right-icons">
 
       <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
-        <a href="index.php?controller=Admin&action=dashboard" class="text-decoration-none text-uppercase fw-bold text-dark d-none d-md-block" style="font-size: 0.85rem; letter-spacing: 1px;">
+        <a href="index.php?controller=Admin&action=dashboard" class="nav-dashboard-link d-none d-md-block">
           Dashboard
         </a>
       <?php endif; ?>
+
+      <div class="dropdown currency-selector">
+        <button class="btn btn-sm btn-outline-dark dropdown-toggle border-0 fw-bold currency-btn" type="button" id="currencyBtn" data-bs-toggle="dropdown">
+          USD $
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+          <li><a class="dropdown-item small" href="#" onclick="changeCurrency('USD')">USD ($)</a></li>
+          <li><a class="dropdown-item small" href="#" onclick="changeCurrency('EUR')">EUR (€)</a></li>
+        </ul>
+      </div>
 
       <a href="/search" class="nav-icon-link">
         <svg class="custom-icon" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
@@ -69,26 +79,22 @@
           <path fill-rule="evenodd" d="M12 11v1H8v13h16V12h-4v-1a4 4 0 0 0-8 0Zm4-2a2 2 0 0 0-2 2v5h-2v-2h-2v9h12v-9h-2v2h-2v-2h-2v-2h2v-1a2 2 0 0 0-2-2Z" clip-rule="evenodd"></path>
         </svg>
 
-        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.6rem;">
+        <span id="cart-count" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-badge">
           <?= isset($_SESSION['cart_count']) ? $_SESSION['cart_count'] : '0' ?>
         </span>
       </a>
 
-      <?php if (isset($_SESSION['user_id'])): ?>
-        <a href="index.php?controller=User&action=profile" class="nav-icon-link">
-          <svg class="custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor">
-            <path fill-rule="evenodd" d="M19.274 16.78A5 5 0 1 0 16 18c3.192 0 6 3.004 6 7h2c0-3.585-1.898-6.796-4.726-8.22ZM19 13a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd"></path>
-            <path d="M10 25c0-2.375 1.013-4.441 2.516-5.696l-1.282-1.535C9.25 19.424 8 22.064 8 25h2Z"></path>
-          </svg>
-        </a>
-      <?php else: ?>
-        <a href="index.php?controller=User&action=login" class="nav-icon-link">
-          <svg class="custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor">
-            <path fill-rule="evenodd" d="M19.274 16.78A5 5 0 1 0 16 18c3.192 0 6 3.004 6 7h2c0-3.585-1.898-6.796-4.726-8.22ZM19 13a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd"></path>
-            <path d="M10 25c0-2.375 1.013-4.441 2.516-5.696l-1.282-1.535C9.25 19.424 8 22.064 8 25h2Z"></path>
-          </svg>
-        </a>
-      <?php endif; ?>
+      <?php 
+        $userLink = isset($_SESSION['user_id']) 
+                    ? 'index.php?controller=User&action=profile' 
+                    : 'index.php?controller=User&action=login';
+      ?>
+      <a href="<?= $userLink ?>" class="nav-icon-link">
+        <svg class="custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor">
+          <path fill-rule="evenodd" d="M19.274 16.78A5 5 0 1 0 16 18c3.192 0 6 3.004 6 7h2c0-3.585-1.898-6.796-4.726-8.22ZM19 13a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd"></path>
+          <path d="M10 25c0-2.375 1.013-4.441 2.516-5.696l-1.282-1.535C9.25 19.424 8 22.064 8 25h2Z"></path>
+        </svg>
+      </a>
 
     </div>
 
