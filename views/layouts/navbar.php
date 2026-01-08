@@ -33,6 +33,7 @@
         </li>
 
         <?php if (isset($_SESSION['user_id'])): ?>
+          <li><a class="dropdown-item" href="index.php?controller=User&action=profile">My Profile</a></li>
           <li><a class="dropdown-item text-danger" href="index.php?controller=User&action=logout">Log Out</a></li>
         <?php else: ?>
           <li><a class="dropdown-item" href="index.php?controller=User&action=login">Log In</a></li>
@@ -74,7 +75,7 @@
       </a>
 
       <?php if (isset($_SESSION['user_id'])): ?>
-        <a href="<?= ($_SESSION['user_role'] === 'admin') ? 'index.php?controller=Admin&action=dashboard' : '#' ?>" class="nav-icon-link">
+        <a href="index.php?controller=User&action=profile" class="nav-icon-link">
           <svg class="custom-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor">
             <path fill-rule="evenodd" d="M19.274 16.78A5 5 0 1 0 16 18c3.192 0 6 3.004 6 7h2c0-3.585-1.898-6.796-4.726-8.22ZM19 13a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" clip-rule="evenodd"></path>
             <path d="M10 25c0-2.375 1.013-4.441 2.516-5.696l-1.282-1.535C9.25 19.424 8 22.064 8 25h2Z"></path>

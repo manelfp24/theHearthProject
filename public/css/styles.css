@@ -1579,3 +1579,33 @@ footer {
     color: var(--hearth-white) !important;
     border: 1px solid #C21818;
 }
+
+/* Profile Page Styles */
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 2rem;
+    background-color: #212529; /* bg-dark */
+    color: #ffffff;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-title {
+    font-family: 'Libre Baskerville', serif;
+}
+
+.card.shadow-sm {
+    border-radius: 8px;
+}
+
+.list-group-item-action {
+    transition: all 0.2s ease;
+}
+
+.list-group-item-action:hover {
+    background-color: #f8f9fa;
+    padding-left: 1.25rem;
+}

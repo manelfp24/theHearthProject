@@ -178,5 +178,32 @@ class OrderDAO {
         
         return $success;
     }
+
+    /**
+     * Fetches the last N orders for a specific user
+     */
+    public static function getLastOrdersByUser($userId, $limit = 3) {
+        $con = Database::connect();
+        
+        $sql = "SELECT order_id, order_date, total_price, status 
+                FROM customer_order 
+                WHERE user_id = ? 
+                ORDER BY order_date DESC 
+                LIMIT ?";
+
+        $stmt = $con->prepare($sql);
+        $stmt->bind_param("ii", $userId, $limit);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $orders = [];
+        while ($row = $result->fetch_assoc()) {
+            $orders[] = $row;
+        }
+        
+        $stmt->close();
+        $con->close();
+        return $orders;
+    }
 }
 ?>
