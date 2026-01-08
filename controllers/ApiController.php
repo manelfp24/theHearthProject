@@ -1,7 +1,8 @@
 <?php
-// Cargamos DAO
+// Cargamos DAOs
 require_once __DIR__ . '/../models/ProductDAO.php';
 require_once __DIR__ . '/../models/OrderDAO.php';
+require_once __DIR__ . '/../models/LogDAO.php'; // <--- Added LogDAO
 
 class ApiController {
 
@@ -14,11 +15,14 @@ class ApiController {
         }
     }
 
+    // ---------------------------------------------------------
+    // 1. PRODUCTS
+    // ---------------------------------------------------------
+
     // URL: index.php?controller=Api&action=products
     public function products() {
         $products = ProductDAO::getAllProducts();
         
-        // Metemos los objetos en un array para el JSON
         $data = [];
         foreach ($products as $p) {
             $data[] = [
@@ -50,6 +54,10 @@ class ApiController {
 
         header('Content-Type: application/json');
         if ($isDeleted) {
+            // LOG THE ACTION
+            $adminId = $_SESSION['user_id'] ?? 1; // Default to 1 if session missing
+            LogDAO::logAction($adminId, 'Deleted Product', "Product ID: " . $input['id']);
+
             echo json_encode(['success' => true]);
         } else {
             echo json_encode(['success' => false, 'message' => 'Could not delete. It might be in an order.']);
@@ -68,16 +76,28 @@ class ApiController {
         $price = $input['price'];
         $image = $input['image']; 
 
+        $adminId = $_SESSION['user_id'] ?? 1;
+
         if ($id) {
             // --- UPDATE EXISTING ---
             $success = ProductDAO::update($id, $name, $description, $category, $price, $image);
             $message = "Product updated successfully";
+            
+            // LOG UPDATE
+            if($success) {
+                LogDAO::logAction($adminId, 'Updated Product', "Product: $name (ID: $id)");
+            }
         } else {
             // --- CREATE NEW ---
             $newId = ProductDAO::insert($name, $description, $category, $price, $image);
             $success = $newId ? true : false;
             $id = $newId; 
             $message = "Product created successfully";
+
+            // LOG CREATION
+            if($success) {
+                LogDAO::logAction($adminId, 'Created Product', "Product: $name");
+            }
         }
 
         header('Content-Type: application/json');
@@ -89,16 +109,15 @@ class ApiController {
         exit();
     }
 
-    // ---------------------------------------------------
-    // NEW ADDITIONS FOR ORDERS DASHBOARD
-    // ---------------------------------------------------
+    // ---------------------------------------------------------
+    // 2. ORDERS
+    // ---------------------------------------------------------
 
     /**
      * URL: index.php?controller=Api&action=orders
      * Returns all orders with their items
      */
     public function orders() {
-        // We call the OrderDAO to get all orders (grouped by ID)
         $orders = OrderDAO::getAllOrdersWithItems();
         
         header('Content-Type: application/json');
@@ -108,8 +127,6 @@ class ApiController {
 
     /**
      * URL: index.php?controller=Api&action=update_order_status
-     * Method: POST
-     * Payload: { "id": 123, "status": "shipped" }
      */
     public function update_order_status() {
         $input = json_decode(file_get_contents('php://input'), true);
@@ -119,11 +136,32 @@ class ApiController {
             exit();
         }
 
-        // Update the status in the DB
+        // Update DB
         $success = OrderDAO::updateStatus($input['id'], $input['status']);
+
+        // LOG STATUS CHANGE
+        if($success) {
+            $adminId = $_SESSION['user_id'] ?? 1;
+            LogDAO::logAction($adminId, 'Updated Order Status', "Order #{$input['id']} changed to {$input['status']}");
+        }
 
         header('Content-Type: application/json');
         echo json_encode(['success' => $success]);
+        exit();
+    }
+
+    // ---------------------------------------------------------
+    // 3. LOGS (NEW SECTION)
+    // ---------------------------------------------------------
+
+    /**
+     * URL: index.php?controller=Api&action=logs
+     * Returns all admin logs
+     */
+    public function logs() {
+        $logs = LogDAO::getAllLogs();
+        header('Content-Type: application/json');
+        echo json_encode($logs);
         exit();
     }
 }

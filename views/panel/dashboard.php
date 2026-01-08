@@ -1,4 +1,22 @@
 <div class="container-fluid py-4">
+    <style>
+        /* Table Sorting Styles */
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .sortable:hover {
+            background-color: #444; /* Slightly lighter than table-dark */
+            color: #fff;
+        }
+        .sortable::after {
+            content: ' ↕'; /* Visual indicator */
+            font-size: 0.8em;
+            opacity: 0.5;
+        }
+    </style>
+
     <div class="row">
 
         <div class="col-md-2">
@@ -28,11 +46,11 @@
                 <table class="table table-hover bg-white shadow-sm">
                     <thead class="table-dark">
                         <tr>
-                            <th>ID</th>
-                            <th>Name</th>
-                            <th>Category</th>
-                            <th>Price</th>
-                            <th>Status</th>
+                            <th class="sortable" onclick="sortProducts('id')">ID</th>
+                            <th class="sortable" onclick="sortProducts('name')">Name</th>
+                            <th class="sortable" onclick="sortProducts('category')">Category</th>
+                            <th class="sortable" onclick="sortProducts('price')">Price</th>
+                            <th class="sortable" onclick="sortProducts('available')">Status</th>
                             <th>Actions</th> </tr>
                     </thead>
                     <tbody id="productsTableBody">
@@ -57,13 +75,12 @@
                 <table class="table table-hover bg-white shadow-sm">
                     <thead class="table-dark">
                         <tr>
-                            <th>Order ID</th>
-                            <th>Date</th>
-                            <th>User ID</th>
-                            <th>Total ($)</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
+                            <th class="sortable" onclick="sortOrders('id')">Order ID</th>
+                            <th class="sortable" onclick="sortOrders('date')">Date</th>
+                            <th class="sortable" onclick="sortOrders('user_id')">User ID</th>
+                            <th class="sortable" onclick="sortOrders('total')">Total</th>
+                            <th class="sortable" onclick="sortOrders('status')">Status</th>
+                            <th>Actions</th> </tr>
                     </thead>
                     <tbody id="ordersTableBody">
                         </tbody>
@@ -72,7 +89,20 @@
 
             <div id="section-logs" class="content-section d-none">
                 <h2 class="mb-4" style="font-family: 'Libre Baskerville', serif;">System Logs</h2>
-                <p class="text-muted">Logs content will go here...</p>
+                <p class="text-muted mb-4">Track administrative actions and system events.</p>
+
+                <table class="table table-striped table-hover shadow-sm bg-white">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="sortable" onclick="sortLogs('timestamp')">Time</th>
+                            <th class="sortable" onclick="sortLogs('admin_name')">Admin User</th>
+                            <th class="sortable" onclick="sortLogs('action')">Action</th>
+                            <th class="sortable" onclick="sortLogs('affected_entity')">Target</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                        </tbody>
+                </table>
             </div>
 
         </div>
@@ -133,7 +163,8 @@
 </div>
 
 <div class="modal fade" id="orderModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg"> <div class="modal-content">
+    <div class="modal-dialog modal-lg"> 
+        <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Order Details: #<span id="modalOrderId"></span></h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
